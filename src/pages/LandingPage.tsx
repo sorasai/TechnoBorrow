@@ -9,10 +9,6 @@ import AboutSection from "../components/landing/AboutSection";
 import CTASection from "../components/landing/CTASection";
 import FooterSection from "../components/landing/FooterSection";
 
-/* ──────────────────────────────────────────
-   Landing Page — Layout Wrapper
-   All section logic lives in src/components/landing/
-────────────────────────────────────────── */
 const LandingPage: React.FC = () => {
     const scrollTo = (id: string) => {
         const el = document.getElementById(id);
