@@ -328,6 +328,8 @@
     transition: transform 0.15s, box-shadow 0.15s;
     box-shadow: 0 4px 16px rgba(244, 180, 26, 0.35);
     font-family: 'Inter', sans-serif;
+    min-width: 200px;
+    text-align: center;
 }
 
 .lp-hero__btn-primary:hover {
@@ -346,6 +348,8 @@
     cursor: pointer;
     transition: border-color 0.2s, background 0.2s;
     font-family: 'Inter', sans-serif;
+    min-width: 200px;
+    text-align: center;
 }
 
 .lp-hero__btn-secondary:hover {
@@ -387,7 +391,6 @@
 }
 
 .lp-section__tag--centered {
-    display: block;
     text-align: center;
 }
 
@@ -868,7 +871,7 @@
    FOOTER
    ================================================================ */
 .lp-footer {
-    background: #111827;
+    background: #2e2528;
     color: rgba(255, 255, 255, 0.75);
     padding: 64px 24px 32px;
 }

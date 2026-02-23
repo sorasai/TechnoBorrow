@@ -1,7 +1,7 @@
 const TECH_STACK = [
     { icon: "☕", label: "Spring Boot", sub: "RESTful API Backend", mod: "spring" },
     { icon: "⚛️", label: "React", sub: "Web Application Frontend", mod: "react" },
-    { icon: "🐘", label: "PostgreSQL", sub: "Relational Database", mod: "pg" },
+    { icon: "📊", label: "Supabase", sub: "Database", mod: "pg" },
 ];
 
 const VALUE_TAGS = ["Security", "Usability", "Maintainability", "Accountability"];

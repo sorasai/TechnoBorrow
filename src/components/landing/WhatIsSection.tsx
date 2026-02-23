@@ -1,3 +1,5 @@
+import React from "react";
+
 const LIFECYCLE_STEPS = ["Request", "Offer", "Match", "Borrow", "Return"];
 
 const STAT_BOXES = [
