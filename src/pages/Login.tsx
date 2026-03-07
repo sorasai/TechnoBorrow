@@ -1,38 +1,71 @@
 import { useState } from "react";
-import Home from "./Home";
+import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 
 function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (username === "admin" && password === "1234") {
-      setLoggedIn(true);
-    } else {
-      alert("Invalid credentials");
+  const handleLogin = async () => {
+    setError("");
+
+    // Validate empty fields
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
     }
+
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      setError(authError.message);
+      return;
+    }
+
+    navigate("/dashboard");
   };
 
-  if (loggedIn) {
-    return <Home />;
-  }
-
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
+    <div>
       <h2>Login</h2>
-      <input
-        placeholder="Username"
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <br /><br />
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <br /><br />
+
+      <div>
+        <label>Email:</label>
+        <br />
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+      <br />
+
+      <div>
+        <label>Password:</label>
+        <br />
+        <input
+          type="password"
+          placeholder="Enter your password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+      <br />
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
       <button onClick={handleLogin}>Login</button>
+      <br /><br />
+
+      <p>
+        Don't have an account? <Link to="/register">Register here</Link>
+      </p>
     </div>
   );
 }
