@@ -27,7 +27,7 @@ const LandingPage: React.FC = () => {
 
             <div className="lp-page">
                 <NavSection scrollTo={scrollTo} />
-                <HeroSection scrollTo={scrollTo} />
+                <HeroSection />
                 <WhatIsSection />
                 <CorePrinciplesSection />
                 <HowItWorksSection />

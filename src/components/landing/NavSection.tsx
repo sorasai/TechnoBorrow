@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import LogoIcon from "./LogoIcon";
 
 const NAV_LINKS: [string, string][] = [
@@ -13,6 +14,7 @@ interface NavSectionProps {
 }
 
 const NavSection = ({ scrollTo }: NavSectionProps) => {
+    const navigate = useNavigate();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -75,13 +77,13 @@ const NavSection = ({ scrollTo }: NavSectionProps) => {
                 <div className="lp-nav__actions">
                     <button
                         className="lp-nav__login-link"
-                        onClick={() => scrollTo("cta")}
+                        onClick={() => navigate("/login")}
                     >
                         Login
                     </button>
                     <button
                         className="lp-btn-primary"
-                        onClick={() => scrollTo("cta")}
+                        onClick={() => navigate("/register")}
                     >
                         Get Started
                     </button>
@@ -115,14 +117,14 @@ const NavSection = ({ scrollTo }: NavSectionProps) => {
                         <button
                             className="lp-btn-secondary"
                             style={{ flex: 1 }}
-                            onClick={() => scrollTo("cta")}
+                            onClick={() => navigate("/login")}
                         >
                             Login
                         </button>
                         <button
                             className="lp-btn-primary"
                             style={{ flex: 1 }}
-                            onClick={() => scrollTo("cta")}
+                            onClick={() => navigate("/register")}
                         >
                             Get Started
                         </button>
