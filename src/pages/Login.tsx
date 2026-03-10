@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import "../css/login.css";
+import LoginForm from "../components/auth/LoginForm";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -31,42 +33,14 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-
-      <div>
-        <label>Email:</label>
-        <br />
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-      <br />
-
-      <div>
-        <label>Password:</label>
-        <br />
-        <input
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <br />
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <button onClick={handleLogin}>Login</button>
-      <br /><br />
-
-      <p>
-        Don't have an account? <Link to="/register">Register here</Link>
-      </p>
-    </div>
+    <LoginForm
+      email={email}
+      password={password}
+      error={error}
+      onEmailChange={(e) => setEmail(e.target.value)}
+      onPasswordChange={(e) => setPassword(e.target.value)}
+      onSubmit={handleLogin}
+    />
   );
 }
 
