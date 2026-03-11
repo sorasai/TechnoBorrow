@@ -3,13 +3,14 @@ import logo from "../../assets/TechnoBorrow_logo.png";
 
 interface AuthCardProps {
     children: React.ReactNode;
+    variant?: "login" | "register";
 }
 
-const AuthCard = ({ children }: AuthCardProps) => {
+const AuthCard = ({ children, variant = "login" }: AuthCardProps) => {
     const navigate = useNavigate();
 
     return (
-        <div className="auth-page">
+        <div className={`auth-page${variant === "register" ? " auth-page--register" : ""}`}>
             {/* Back button — top-left of the page */}
             <button className="auth-back-btn" onClick={() => navigate("/landing")}>
                 ← Back

@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import "../css/auth.css";
+import RegisterForm from "../components/auth/RegisterForm";
 
 function Register() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -44,66 +47,20 @@ function Register() {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-
-      <div>
-        <label>Full Name:</label>
-        <br />
-        <input
-          type="text"
-          placeholder="Enter your full name"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-        />
-      </div>
-      <br />
-
-      <div>
-        <label>Email:</label>
-        <br />
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-      <br />
-
-      <div>
-        <label>Password:</label>
-        <br />
-        <input
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <br />
-
-      <div>
-        <label>Confirm Password:</label>
-        <br />
-        <input
-          type="password"
-          placeholder="Confirm your password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-      </div>
-      <br />
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <button onClick={handleRegister}>Register</button>
-      <br /><br />
-
-      <p>
-        Already have an account? <Link to="/login">Login here</Link>
-      </p>
-    </div>
+    <RegisterForm
+      fullName={fullName}
+      email={email}
+      password={password}
+      confirmPassword={confirmPassword}
+      agreed={agreed}
+      error={error}
+      onFullNameChange={(e) => setFullName(e.target.value)}
+      onEmailChange={(e) => setEmail(e.target.value)}
+      onPasswordChange={(e) => setPassword(e.target.value)}
+      onConfirmPasswordChange={(e) => setConfirmPassword(e.target.value)}
+      onAgreedChange={(e) => setAgreed(e.target.checked)}
+      onSubmit={handleRegister}
+    />
   );
 }
 
