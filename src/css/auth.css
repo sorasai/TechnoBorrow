@@ -6,7 +6,7 @@
     align-items: center;
     justify-content: center;
     background: linear-gradient(145deg,
-            #F4B41A 20%,
+            #F4B41A 0%,
             #7A1E2D 50%,
             #5A0F1B 100%);
     font-family: 'Inter', sans-serif;
@@ -73,8 +73,8 @@
 
     background: linear-gradient(
         90deg,
-        #FF7A2F 0%,
-        #F4B41A 60%,
+            #FF7A2F 0%,
+            #F4B41A 60%,
         #FFD35A 100%
     );
 
@@ -238,4 +238,60 @@
     .auth-card {
         padding: 36px 28px;
     }
+}
+
+/* Register page*/
+.auth-page--register .auth-back-btn {
+    color: #F4B41A;
+}
+
+.auth-page--register .auth-back-btn:hover {
+    color: #FFD35A;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-page--register {
+    background: linear-gradient(145deg,
+            #5A0F1B 0%,
+            #7A1E2D 50%,
+            #F4B41A 100%);
+}
+
+.auth-page--register .auth-card {
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.auth-page--register .auth-card::-webkit-scrollbar {
+    display: none;
+}
+
+.auth-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 18px;
+    cursor: pointer;
+}
+
+.auth-checkbox__input {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: #F4B41A;
+    cursor: pointer;
+}
+
+.auth-checkbox__label {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.5;
+}
+
+.auth-checkbox__link {
+    color: #F4B41A;
+    font-weight: 600;
 }

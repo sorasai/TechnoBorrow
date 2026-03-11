@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import "../css/login.css";
+import "../css/auth.css";
 import LoginForm from "../components/auth/LoginForm";
 
 function Login() {

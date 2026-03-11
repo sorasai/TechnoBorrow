@@ -33,7 +33,7 @@ const LoginForm = ({
             <AuthInput
                 label="CIT-U Email"
                 type="email"
-                placeholder="you@cit.edu"
+                placeholder="e.g. firstname.lastname@cit.edu"
                 value={email}
                 onChange={onEmailChange}
             />
