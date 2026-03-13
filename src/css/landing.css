@@ -60,7 +60,7 @@
 .lp-nav__logo-wrapper {
     width: 40px;
     height: 40px;
-    background: var(--color-primary);
+    background: none;
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -234,28 +234,6 @@
     padding: 96px 24px;
     text-align: center;
     overflow: hidden;
-}
-
-.lp-hero__orb-top {
-    position: absolute;
-    top: -80px;
-    right: -80px;
-    width: 400px;
-    height: 400px;
-    border-radius: 50%;
-    background: rgba(244, 180, 26, 0.07);
-    pointer-events: none;
-}
-
-.lp-hero__orb-bottom {
-    position: absolute;
-    bottom: -60px;
-    left: -60px;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    pointer-events: none;
 }
 
 .lp-hero__content {

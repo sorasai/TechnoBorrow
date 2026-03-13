@@ -4,7 +4,7 @@ import LogoIcon from "./LogoIcon";
 
 const NAV_LINKS: [string, string][] = [
     ["home", "Home"],
-    ["what", "How It Works"],
+    ["how-it-works", "How It Works"],
     ["features", "Features"],
     ["about", "About"],
 ];
