@@ -9,8 +9,8 @@ const STAT_BOXES = [
 ];
 
 const WhatIsSection = () => (
-    <section id="what" className="lp-section-alt">
-        <div className="lp-section-alt__inner">
+    <section id="what" className="lp-section">
+        <div className="lp-section">
             <div className="lp-what__grid">
 
                 {/* Text */}

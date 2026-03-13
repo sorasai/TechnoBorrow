@@ -29,7 +29,7 @@ const LandingPage: React.FC = () => {
                 <NavSection scrollTo={scrollTo} />
                 <HeroSection />
                 <WhatIsSection />
-                <CorePrinciplesSection />
+                {/* <CorePrinciplesSection /> */}
                 <HowItWorksSection />
                 <PlatformFeaturesSection />
                 <AboutSection />
