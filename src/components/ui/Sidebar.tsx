@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   FileText, 
@@ -8,12 +8,21 @@ import {
   LogOut, 
   X 
 } from "lucide-react";
+import { supabase } from "../../lib/supabase";
 import "../../css/sidebar.css";
 import TechnoBorrowLogo from "../../assets/TechnoBorrow_logo.png";
 
 function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
+
+  const currentPath = location.pathname;
 
   return (
     <div 
@@ -51,7 +60,7 @@ function Sidebar() {
       
       <div className="sidebar-menu-list">
         <div 
-          className={`sidebar-item-hover sidebar-item-dashboard ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
+          className={`sidebar-item-hover ${currentPath === "/dashboard" ? "sidebar-item-active" : "sidebar-item-normal"} ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
           onClick={() => navigate("/dashboard")}
           title="Dashboard"
         >
@@ -60,7 +69,7 @@ function Sidebar() {
         </div>
         
         <div 
-          className={`sidebar-item-hover sidebar-item-normal ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
+          className={`sidebar-item-hover ${currentPath === "/requests" ? "sidebar-item-active" : "sidebar-item-normal"} ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
           onClick={() => {}}
           title="My Requests"
         >
@@ -69,7 +78,7 @@ function Sidebar() {
         </div>
 
         <div 
-          className={`sidebar-item-hover sidebar-item-normal ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
+          className={`sidebar-item-hover ${currentPath === "/transactions" ? "sidebar-item-active" : "sidebar-item-normal"} ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
           onClick={() => {}}
           title="My Transactions"
         >
@@ -78,7 +87,7 @@ function Sidebar() {
         </div>
 
         <div 
-          className={`sidebar-item-hover sidebar-item-normal ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
+          className={`sidebar-item-hover ${currentPath === "/profile" ? "sidebar-item-active" : "sidebar-item-normal"} ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
           onClick={() => navigate("/profile")}
           title="Profile"
         >
@@ -90,7 +99,7 @@ function Sidebar() {
 
         <div 
           className={`sidebar-item-hover sidebar-item-logout ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
-          onClick={() => navigate("/login")}
+          onClick={handleLogout}
           title="Logout"
         >
           <LogOut size={20} />
