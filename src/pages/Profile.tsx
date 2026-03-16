@@ -5,6 +5,7 @@ import "../css/profile.css";
 import { ProfilePhotoSection } from "../components/profile/ProfilePhotoSection";
 import { EditProfileForm } from "../components/profile/EditProfileForm";
 import { ChangePasswordForm } from "../components/profile/ChangePasswordForm";
+import Sidebar from "../components/ui/Sidebar";
 
 function Profile() {
     const navigate = useNavigate();
@@ -26,12 +27,6 @@ function Profile() {
         loadUser();
     }, [navigate]);
 
-    // Logout 
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        navigate("/login");
-    };
-
     if (loading) return <div className="profile-page"><div className="profile-loading">Loading...</div></div>;
 
     const email = user.email ?? "";
@@ -39,36 +34,29 @@ function Profile() {
     const avatarUrl = user.user_metadata?.avatar_url ?? null;
 
     return (
-        <div className="profile-page">
-            {/* Navbar */}
-            <nav className="profile-navbar">
-                <button className="profile-navbar__back" onClick={() => navigate("/dashboard")}>
-                    ← Back to Dashboard
-                </button>
-                <span className="profile-navbar__brand">TechnoBorrow</span>
-                <button className="profile-navbar__logout" onClick={handleLogout}>
-                    Sign Out
-                </button>
-            </nav>
-
-            {/* Content */}
-            <main className="profile-content">
-                {/* Page Heading */}
-                <div className="profile-header">
-                    <h1 className="profile-header__title">My Profile</h1>
-                    <p className="profile-header__subtitle">Manage your account information</p>
-                </div>
-
-                <div className="profile-grid">
-                    <div className="profile-col">
-                        <ProfilePhotoSection initialAvatarUrl={avatarUrl} />
-                        <EditProfileForm initialFullName={fullName} email={email} />
+        <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Inter', sans-serif", background: "linear-gradient(135deg, #5A0F1B 0%, #7A1E2D 50%, #F4B41A 100%)" }}>
+            <Sidebar />
+            
+            <div className="profile-page" style={{ flex: 1, background: "transparent" }}>
+                {/* Content */}
+                <main className="profile-content">
+                    {/* Page Heading */}
+                    <div className="profile-header">
+                        <h1 className="profile-header__title">My Profile</h1>
+                        <p className="profile-header__subtitle">Manage your account information</p>
                     </div>
-                    <div className="profile-col">
-                        <ChangePasswordForm />
+
+                    <div className="profile-grid">
+                        <div className="profile-col">
+                            <ProfilePhotoSection initialAvatarUrl={avatarUrl} />
+                            <EditProfileForm initialFullName={fullName} email={email} />
+                        </div>
+                        <div className="profile-col">
+                            <ChangePasswordForm />
+                        </div>
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 }
