@@ -1,62 +1,138 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User } from "lucide-react";
+import { User, ClipboardList, RefreshCw, Package, Search, Plus } from "lucide-react";
 import Sidebar from "../components/ui/Sidebar";
+import { supabase } from "../lib/supabase";
+import "../css/dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+      setUser(user);
+    };
+    loadUser();
+  }, [navigate]);
+
+  const avatarUrl = user?.user_metadata?.avatar_url;
+  const fullName = user?.user_metadata?.full_name || "User";
+  const firstName = fullName.split(" ")[0];
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Inter', sans-serif", background: "linear-gradient(145deg, #5A0F1B 0%, #7A1E2D 50%, #F4B41A 100%)" }}>
+    <div className="dashboard-container">
       <Sidebar />
-
-      {/* Main Content */}
-      <div style={{ flex: 1, padding: "32px", overflowY: "auto" }}>
-        {/* Simple top bar with profile button */}
-        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: "32px" }}>
-          <button
-            id="profile-btn"
-            onClick={() => navigate("/profile")}
-            title="My Profile"
-            style={{
-              display: "inline-flex", alignItems: "center", gap: "8px",
-              background: "rgba(120, 55, 10, 0.40)",
-              border: "1px solid rgba(255,255,255,0.15)",
-              borderRadius: "10px",
-              color: "#fff",
-              fontSize: "13px", fontWeight: 600,
-              fontFamily: "'Inter', sans-serif",
-              padding: "9px 16px",
-              cursor: "pointer",
-              backdropFilter: "blur(10px)",
-              transition: "background 0.2s, transform 0.15s",
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = "rgba(244,180,26,0.25)")}
-            onMouseLeave={e => (e.currentTarget.style.background = "rgba(120,55,10,0.40)")}
+      <div className="dashboard-main-area">
+        {/* Header */}
+        <header className="dashboard-header">
+          <h1 className="dashboard-header-title">
+            TechnoBorrow
+          </h1>
+          <div 
+            className="dashboard-profile-avatar" 
+            onClick={() => navigate("/profile")} 
+            title="Go to Profile"
           >
-            <User size={16} /> My Profile
-          </button>
-        </div>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Profile" />
+            ) : (
+              <User size={20} color="#6B7280" />
+            )}
+          </div>
+        </header>
 
-        <div style={{
-          fontSize: "22px", fontWeight: 800, letterSpacing: "-0.4px",
-          background: "linear-gradient(90deg, #FF7A2F 0%, #F4B41A 60%, #FFD35A 100%)",
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          marginBottom: "8px",
-          display: "inline-block"
-        }}>
-          TechnoBorrow
-        </div>
-        <h2 style={{ color: "#fff", fontWeight: 700, fontSize: "28px", margin: 0, textShadow: "0 2px 4px rgba(0,0,0,0.2)" }}>
-          Welcome to TechnoBorrow Dashboard
-        </h2>
-        <p style={{ color: "rgba(255,255,255,0.8)", marginTop: "12px", fontSize: "15px" }}>
-          More features coming soon.
-        </p>
+        {/* Dashboard Main Content */}
+        <main className="dashboard-content">
+          
+          {/* Welcome Section */}
+          <div className="dashboard-welcome">
+            <h2 className="dashboard-welcome-title">
+              Hello, {firstName}!
+            </h2>
+            <p className="dashboard-welcome-subtitle">
+              Manage your borrowing requests, monitor active transactions, and explore equipment posted by fellow Teknoys.
+            </p>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="dashboard-stats-grid">
+            {/* Card 1 */}
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-icon-wrapper yellow">
+                <ClipboardList size={24} color="#FFFFFF" />
+              </div>
+              <div>
+                <h3 className="dashboard-stat-title">My Active Requests</h3>
+                <p className="dashboard-stat-desc">
+                  Borrowing requests you have posted that are awaiting or in progress.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 2 (Active/Bordered) */}
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-icon-wrapper orange">
+                <RefreshCw size={24} color="#FFFFFF" />
+              </div>
+              <div>
+                <h3 className="dashboard-stat-title">Ongoing Transactions</h3>
+                <p className="dashboard-stat-desc">
+                  Active borrowing or lending transactions that require monitoring or action.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 3 */}
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-icon-wrapper green">
+                <Package size={24} color="#FFFFFF" />
+              </div>
+              <div>
+                <h3 className="dashboard-stat-title">Returned Transactions</h3>
+                <p className="dashboard-stat-desc">
+                  Transactions that have been successfully completed and confirmed as returned.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Area */}
+          <div className="dashboard-action-area">
+            {/* Search Input */}
+            <div className="dashboard-search-wrapper">
+              <Search size={18} color="#9CA3AF" className="dashboard-search-icon" />
+              <input 
+                type="text" 
+                placeholder="Search for items..." 
+                className="dashboard-search-input"
+              />
+            </div>
+            {/* Create Button */}
+            <button className="dashboard-create-btn">
+              <Plus size={16} /> Create Request
+            </button>
+          </div>
+
+          {/* Empty State / Content Area */}
+          <div className="dashboard-empty-state">
+            <p className="dashboard-empty-title">
+              No borrowing requests available at the moment.
+            </p>
+            <p className="dashboard-empty-subtext">
+              Be the first to post a request.
+            </p>
+          </div>
+
+        </main>
       </div>
     </div>
   );
 }
 
 export default Dashboard;
-
