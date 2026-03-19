@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, ClipboardList, RefreshCw, Package, Search, Plus } from "lucide-react";
 import Sidebar from "../components/ui/Sidebar";
+import CreateRequestModal from "../components/dashboard/CreateRequestModal";
 import { supabase } from "../lib/supabase";
 import "../css/dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -114,7 +116,7 @@ function Dashboard() {
               />
             </div>
             {/* Create Button */}
-            <button className="dashboard-create-btn">
+            <button className="dashboard-create-btn" onClick={() => setIsModalOpen(true)}>
               <Plus size={16} /> Create Request
             </button>
           </div>
@@ -131,6 +133,10 @@ function Dashboard() {
 
         </main>
       </div>
+
+      {isModalOpen && (
+        <CreateRequestModal onClose={() => setIsModalOpen(false)} />
+      )}
     </div>
   );
 }
