@@ -6,6 +6,7 @@ import { ProfilePhotoSection } from "../components/profile/ProfilePhotoSection";
 import { EditProfileForm } from "../components/profile/EditProfileForm";
 import { ChangePasswordForm } from "../components/profile/ChangePasswordForm";
 import Sidebar from "../components/ui/Sidebar";
+import { User } from "lucide-react";
 
 function Profile() {
     const navigate = useNavigate();
@@ -27,23 +28,41 @@ function Profile() {
         loadUser();
     }, [navigate]);
 
-    if (loading) return <div className="profile-page"><div className="profile-loading">Loading...</div></div>;
+    if (loading) return <div className="profile-container"><div className="profile-loading">Loading...</div></div>;
 
     const email = user.email ?? "";
     const fullName = user.user_metadata?.full_name ?? "";
     const avatarUrl = user.user_metadata?.avatar_url ?? null;
 
     return (
-        <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Inter', sans-serif", background: "linear-gradient(135deg, #5A0F1B 0%, #7A1E2D 50%, #F4B41A 100%)" }}>
+        <div className="profile-container">
             <Sidebar />
             
-            <div className="profile-page" style={{ flex: 1, background: "transparent" }}>
+            <div className="profile-main-area">
+                <header className="profile-top-navbar">
+                    <h1 className="profile-top-navbar__title">TechnoBorrow</h1>
+                    <div className="profile-top-navbar__avatar" title="My Profile">
+                        {avatarUrl ? (
+                            <img src={avatarUrl} alt="Profile" />
+                        ) : (
+                            <User size={20} color="#6B7280" />
+                        )}
+                    </div>
+                </header>
+
                 {/* Content */}
                 <main className="profile-content">
                     {/* Page Heading */}
                     <div className="profile-header">
-                        <h1 className="profile-header__title">My Profile</h1>
-                        <p className="profile-header__subtitle">Manage your account information</p>
+                        <div className="profile-header__title-wrapper">
+                            <div className="profile-header__icon">
+                                <User size={28} strokeWidth={2.5} />
+                            </div>
+                            <div>
+                                <h1 className="profile-header__title">My Profile</h1>
+                                <p className="profile-header__subtitle">Manage your account information and preferences</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="profile-grid">
