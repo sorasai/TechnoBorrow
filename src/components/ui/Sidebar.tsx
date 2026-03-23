@@ -11,11 +11,13 @@ import {
 import { supabase } from "../../lib/supabase";
 import "../../css/sidebar.css";
 import TechnoBorrowLogo from "../../assets/TechnoBorrow_logo.png";
+import LogoutModal from "./LogoutModal";
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -99,7 +101,7 @@ function Sidebar() {
 
         <div 
           className={`sidebar-item-hover sidebar-item-logout ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
-          onClick={handleLogout}
+          onClick={() => setIsLogoutModalOpen(true)}
           title="Logout"
         >
           <LogOut size={20} />
@@ -110,6 +112,12 @@ function Sidebar() {
       <div className="sidebar-footer" style={{ display: isCollapsed ? "none" : "block" }}>
         © 2026 TechnoBorrow – CIT-U Academic Project
       </div>
+
+      <LogoutModal 
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 }
