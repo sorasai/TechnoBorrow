@@ -7,6 +7,7 @@ import { EditProfileForm } from "../components/profile/EditProfileForm";
 import { ChangePasswordForm } from "../components/profile/ChangePasswordForm";
 import Sidebar from "../components/ui/Sidebar";
 import { User } from "lucide-react";
+import Header from "../components/ui/Header";
 
 function Profile() {
     const navigate = useNavigate();
@@ -39,16 +40,10 @@ function Profile() {
             <Sidebar />
             
             <div className="profile-main-area">
-                <header className="profile-top-navbar">
-                    <h1 className="profile-top-navbar__title">TechnoBorrow</h1>
-                    <div className="profile-top-navbar__avatar" title="My Profile">
-                        {avatarUrl ? (
-                            <img src={avatarUrl} alt="Profile" />
-                        ) : (
-                            <User size={20} color="#6B7280" />
-                        )}
-                    </div>
-                </header>
+                <Header
+                    avatarUrl={avatarUrl}
+                    onProfileClick={() => navigate("/profile")}
+                />
 
                 {/* Content */}
                 <main className="profile-content">

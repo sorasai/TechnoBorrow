@@ -1,17 +1,17 @@
 import React from 'react';
 import { User } from 'lucide-react';
 
-interface DashboardHeaderProps {
+interface HeaderProps {
   avatarUrl?: string;
   onProfileClick: () => void;
 }
 
-const DashboardHeader: React.FC<DashboardHeaderProps> = ({ avatarUrl, onProfileClick }) => {
+const Header: React.FC<HeaderProps> = ({ avatarUrl, onProfileClick }) => {
   return (
-    <header className="dashboard-header">
-      <h1 className="dashboard-header-title">TechnoBorrow</h1>
+    <header className="header">
+      <h1 className="header-title">TechnoBorrow</h1>
       <div 
-        className="dashboard-profile-avatar" 
+        className="profile-avatar" 
         onClick={onProfileClick} 
         title="Go to Profile"
       >
@@ -25,4 +25,4 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ avatarUrl, onProfileC
   );
 };
 
-export default DashboardHeader;
+export default Header;
