@@ -15,7 +15,7 @@
 }
 
 /* Dashboard Header */
-.dashboard-header {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -26,7 +26,7 @@
   z-index: 10;
 }
 
-.dashboard-header-title {
+.header-title {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
@@ -45,7 +45,7 @@
     color: transparent;
 }
 
-.dashboard-profile-avatar {
+.profile-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -58,7 +58,7 @@
   cursor: pointer;
 }
 
-.dashboard-profile-avatar img {
+.profile-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import Sidebar from "../components/ui/Sidebar";
 import CreateRequestModal from "../components/dashboard/CreateRequestModal";
-import DashboardHeader from "../components/dashboard/DashboardHeader";
+import Header from "../components/ui/Header";
 import DashboardWelcome from "../components/dashboard/DashboardWelcome";
 import StatsCards from "../components/dashboard/StatsCards";
 import SearchBar from "../components/dashboard/SearchBar";
@@ -37,7 +37,7 @@ function Dashboard() {
       <Sidebar />
       <div className="dashboard-main-area">
         {/* Header */}
-        <DashboardHeader 
+        <Header  
           avatarUrl={avatarUrl} 
           onProfileClick={() => navigate("/profile")} 
         />
