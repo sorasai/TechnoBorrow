@@ -8,8 +8,36 @@ import DashboardWelcome from "../components/dashboard/DashboardWelcome";
 import StatsCards from "../components/dashboard/StatsCards";
 import SearchBar from "../components/dashboard/SearchBar";
 import EmptyState from "../components/dashboard/EmptyState";
+import RequestCard from "../components/dashboard/RequestCard";
 import { supabase } from "../lib/supabase";
 import "../css/dashboard.css";
+
+const MOCK_REQUESTS = [
+  {
+    id: 1,
+    itemName: "MacBook Pro M2 - Need for final project",
+    description: "Looking to borrow a MacBook Pro for a week to compile my iOS application. Mine is currently broken and in repair.",
+    requesterName: "Sarah Jenkins",
+    createdAt: "2 hours ago",
+    status: "Posted"
+  },
+  {
+    id: 2,
+    itemName: "Arduino Starter Kit",
+    description: "I need an Arduino kit for my robotics class this semester. Will return it in pristine condition by December.",
+    requesterName: "Mark Denson",
+    createdAt: "5 hours ago",
+    status: "Pending"
+  },
+  {
+    id: 3,
+    itemName: "Scientific Calculator (Casio fx-991EX)",
+    description: "Forgot mine and have a calculus midterm tomorrow. Can meet anywhere on campus!",
+    requesterName: "Emily Chen",
+    createdAt: "1 day ago",
+    status: "Posted"
+  }
+];
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -61,8 +89,27 @@ function Dashboard() {
             </button>
           </div>
 
-          {/* Empty State / Content Area */}
-          <EmptyState />
+          {/* Requests Feed */}
+          <div className="requests-section">
+            <h2 className="requests-section-title">Explore Borrowing Requests</h2>
+            <p className="requests-section-subtitle">Active campus requests available for lending</p>
+            {MOCK_REQUESTS.length > 0 ? (
+              <div className="requests-grid">
+                {MOCK_REQUESTS.map((req) => (
+                  <RequestCard 
+                    key={req.id}
+                    itemName={req.itemName}
+                    description={req.description}
+                    requesterName={req.requesterName}
+                    createdAt={req.createdAt}
+                    status={req.status}
+                  />
+                ))}
+              </div>
+            ) : (
+              <EmptyState />
+            )}
+          </div>
 
         </main>
       </div>
