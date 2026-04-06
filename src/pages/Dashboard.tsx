@@ -9,7 +9,7 @@ import StatsCards from "../components/dashboard/StatsCards";
 import SearchBar from "../components/dashboard/SearchBar";
 import EmptyState from "../components/dashboard/EmptyState";
 import RequestCard from "../components/dashboard/RequestCard";
-import { supabase } from "../lib/supabase";
+import { authApi } from "../api/auth";
 import "../css/dashboard.css";
 
 const MOCK_REQUESTS = [
@@ -45,8 +45,8 @@ function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const loadUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+    const loadUser = () => {
+      const user = authApi.getCurrentUser();
       if (!user) {
         navigate("/login");
         return;
@@ -56,8 +56,8 @@ function Dashboard() {
     loadUser();
   }, [navigate]);
 
-  const avatarUrl = user?.user_metadata?.avatar_url;
-  const fullName = user?.user_metadata?.full_name || "User";
+  const avatarUrl = user?.profileImage ? `data:image/jpeg;base64,${user.profileImage}` : undefined;
+  const fullName = user?.fullName || "User";
   const firstName = fullName.split(" ")[0];
 
   return (

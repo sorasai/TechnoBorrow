@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { authApi } from "../api/auth";
 import "../css/auth.css";
 import RegisterForm from "../components/auth/RegisterForm";
 
@@ -28,22 +28,23 @@ function Register() {
       return;
     }
 
-    const { error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-        },
-      },
-    });
-
-    if (authError) {
-      setError(authError.message);
-      return;
+    try {
+      const response = await authApi.register({ email, passwordHash: password, fullName });
+      
+      if (typeof response === 'string' && response.startsWith('Error:')) {
+        setError(response.replace('Error: ', ''));
+        return;
+      }
+      
+      if (response && response.id) {
+        authApi.setCurrentUser(response);
+        navigate("/dashboard");
+      } else {
+        setError("Registration failed. Please try again.");
+      }
+    } catch (err: any) {
+      setError("An error occurred connecting to the server.");
     }
-
-    navigate("/dashboard");
   };
 
   return (

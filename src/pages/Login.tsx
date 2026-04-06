@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { authApi } from "../api/auth";
 import "../css/auth.css";
 import LoginForm from "../components/auth/LoginForm";
 
@@ -19,17 +19,23 @@ function Login() {
       return;
     }
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const response = await authApi.login({ email, password });
+      
+      if (typeof response === 'string' && response.startsWith('Login Failed')) {
+        setError(response);
+        return;
+      }
 
-    if (authError) {
-      setError(authError.message);
-      return;
+      if (response && response.id) {
+        authApi.setCurrentUser(response);
+        navigate("/dashboard");
+      } else {
+        setError("Invalid credentials.");
+      }
+    } catch (err: any) {
+      setError("An error occurred connecting to the server.");
     }
-
-    navigate("/dashboard");
   };
 
   return (

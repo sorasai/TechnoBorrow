@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { authApi } from "../api/auth";
 import "../css/profile.css";
 import { ProfilePhotoSection } from "../components/profile/ProfilePhotoSection";
 import { EditProfileForm } from "../components/profile/EditProfileForm";
@@ -17,8 +17,8 @@ function Profile() {
 
     // ── Load current user on mount ───────────────────────────────
     useEffect(() => {
-        const loadUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
+        const loadUser = () => {
+            const user = authApi.getCurrentUser();
             if (!user) {
                 navigate("/login");
                 return;
@@ -32,8 +32,8 @@ function Profile() {
     if (loading) return <div className="profile-container"><div className="profile-loading">Loading...</div></div>;
 
     const email = user.email ?? "";
-    const fullName = user.user_metadata?.full_name ?? "";
-    const avatarUrl = user.user_metadata?.avatar_url ?? null;
+    const fullName = user.fullName ?? "";
+    const avatarUrl = user.profileImage ? `data:image/jpeg;base64,${user.profileImage}` : undefined;
 
     return (
         <div className="profile-container">
