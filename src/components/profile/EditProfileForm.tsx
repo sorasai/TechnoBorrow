@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { authApi } from "../../api/auth";
 import { InputField } from "../ui/InputField";
 import { Button } from "../ui/Button";
 
@@ -16,14 +16,26 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ initialFullNam
     const handleSaveProfile = async () => {
         setProfileMsg(null);
         setSavingProfile(true);
-        const { error } = await supabase.auth.updateUser({
-            data: { full_name: fullName },
-        });
-        setSavingProfile(false);
-        if (error) {
-            setProfileMsg({ type: "error", text: error.message });
-        } else {
-            setProfileMsg({ type: "success", text: "Profile updated successfully." });
+        try {
+            const user = authApi.getCurrentUser();
+            if (!user?.id) throw new Error("No active session.");
+
+            const response = await authApi.editProfile(user.id, { fullName });
+            
+            if (typeof response === "string" && response === "Profile Updated") {
+                // Update local session
+                user.fullName = fullName;
+                authApi.setCurrentUser(user);
+                setProfileMsg({ type: "success", text: "Profile updated successfully." });
+            } else if (typeof response === "string") {
+                setProfileMsg({ type: "error", text: response });
+            } else {
+                setProfileMsg({ type: "error", text: "Failed to update profile." });
+            }
+        } catch (error: any) {
+            setProfileMsg({ type: "error", text: "An error occurred connecting to the server." });
+        } finally {
+            setSavingProfile(false);
         }
     };
 

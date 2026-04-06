@@ -1,12 +1,12 @@
 import React, { useState, useRef } from "react";
-import { supabase } from "../../lib/supabase";
+import { authApi } from "../../api/auth";
 
 interface ProfilePhotoSectionProps {
-    initialAvatarUrl: string | null;
+    initialAvatarUrl: string | null | undefined;
 }
 
 export const ProfilePhotoSection: React.FC<ProfilePhotoSectionProps> = ({ initialAvatarUrl }) => {
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(initialAvatarUrl);
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(initialAvatarUrl ?? null);
     const [avatarMsg, setAvatarMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,15 +53,27 @@ export const ProfilePhotoSection: React.FC<ProfilePhotoSectionProps> = ({ initia
                 img.src = dataUrl;
             });
 
-            // 3. Save base64 into user_metadata
-            const { error } = await supabase.auth.updateUser({
-                data: { avatar_url: compressed },
-            });
+            // 3. Send file to backend
+            const user = authApi.getCurrentUser();
+            if (!user?.id) throw new Error("No active session.");
 
-            if (error) throw error;
+            // Convert canvas dataUrl back to a File to send to backend
+            const res = await fetch(compressed);
+            const blob = await res.blob();
+            const compressedFile = new File([blob], "avatar.jpg", { type: "image/jpeg" });
 
-            setAvatarUrl(compressed);
-            setAvatarMsg({ type: "success", text: "Photo updated successfully." });
+            const response = await authApi.uploadPhoto(user.id, compressedFile);
+
+            if (typeof response === "string" && response === "Photo Uploaded Successfully") {
+                const updatedUser = await authApi.getProfile(user.id);
+                authApi.setCurrentUser(updatedUser);
+
+                const newAvatarUrl = updatedUser.profileImage ? `data:image/jpeg;base64,${updatedUser.profileImage}` : null;
+                setAvatarUrl(newAvatarUrl);
+                setAvatarMsg({ type: "success", text: "Photo updated successfully." });
+            } else {
+                throw new Error("Upload failed on server.");
+            }
         } catch (err: any) {
             setAvatarMsg({ type: "error", text: err?.message ?? "Upload failed." });
         } finally {
@@ -70,14 +82,7 @@ export const ProfilePhotoSection: React.FC<ProfilePhotoSectionProps> = ({ initia
     };
 
     const handleRemoveAvatar = async () => {
-        setAvatarMsg(null);
-        const { error } = await supabase.auth.updateUser({ data: { avatar_url: null } });
-        if (error) {
-            setAvatarMsg({ type: "error", text: error.message });
-        } else {
-            setAvatarUrl(null);
-            setAvatarMsg({ type: "success", text: "Photo removed." });
-        }
+        setAvatarMsg({ type: "error", text: "Removing photo is currently not supported by the backend endpoint." });
     };
 
     return (

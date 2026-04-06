@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { authApi } from "../../api/auth";
 import { InputField } from "../ui/InputField";
 import { Button } from "../ui/Button";
 
@@ -27,16 +27,26 @@ export const ChangePasswordForm: React.FC = () => {
         }
 
         setSavingPassword(true);
-        const { error } = await supabase.auth.updateUser({ password: newPassword });
-        setSavingPassword(false);
+        try {
+            const user = authApi.getCurrentUser();
+            if (!user?.id) throw new Error("No active session.");
 
-        if (error) {
-            setPasswordMsg({ type: "error", text: error.message });
-        } else {
-            setPasswordMsg({ type: "success", text: "Password changed successfully." });
-            setCurrentPassword("");
-            setNewPassword("");
-            setConfirmPassword("");
+            const response = await authApi.changePassword(user.id, { newPassword });
+            
+            if (typeof response === "string" && response === "Password Changed Successfully") {
+                setPasswordMsg({ type: "success", text: "Password changed successfully." });
+                setCurrentPassword("");
+                setNewPassword("");
+                setConfirmPassword("");
+            } else if (typeof response === "string") {
+                setPasswordMsg({ type: "error", text: response });
+            } else {
+                setPasswordMsg({ type: "error", text: "Failed to change password." });
+            }
+        } catch (error: any) {
+            setPasswordMsg({ type: "error", text: "An error occurred connecting to the server." });
+        } finally {
+            setSavingPassword(false);
         }
     };
 

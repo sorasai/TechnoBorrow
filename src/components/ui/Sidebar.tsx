@@ -8,7 +8,7 @@ import {
   LogOut, 
   X 
 } from "lucide-react";
-import { supabase } from "../../lib/supabase";
+import { authApi } from "../../api/auth";
 import "../../css/sidebar.css";
 import TechnoBorrowLogo from "../../assets/TechnoBorrow_logo.png";
 import LogoutModal from "./LogoutModal";
@@ -19,8 +19,8 @@ function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    authApi.logout();
     navigate("/login");
   };
 
