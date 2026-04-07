@@ -1,3 +1,7 @@
+# FRONTEND (React)
+node_modules/
+build/
+
 # BACKEND (Spring Boot)
 /backend/**/target/
 *.class
