@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { X, Upload } from 'lucide-react';
+import { authApi } from '../../api/auth';
+import { borrowingApi } from '../../api/borrowing';
 
 interface CreateRequestModalProps {
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-const CreateRequestModal: React.FC<CreateRequestModalProps> = ({ onClose }) => {
+const CreateRequestModal: React.FC<CreateRequestModalProps> = ({ onClose, onSuccess }) => {
   const [itemName, setItemName] = useState('');
   const [description, setDescription] = useState('');
   const [purpose, setPurpose] = useState('');
@@ -15,10 +18,31 @@ const CreateRequestModal: React.FC<CreateRequestModalProps> = ({ onClose }) => {
   const [endTime, setEndTime] = useState('');
   const [duration, setDuration] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // handle submit logic here
-    onClose();
+    try {
+      const user = authApi.getCurrentUser();
+      if (!user) {
+        alert("Please log in first.");
+        return;
+      }
+      
+      const payload = {
+        requesterId: user.id,
+        itemName,
+        description,
+        purpose,
+        startDate: `${startDate}T${startTime}:00`,
+        endDate: `${endDate}T${endTime}:00`
+      };
+
+      await borrowingApi.createRequest(payload);
+      if (onSuccess) onSuccess();
+      onClose();
+    } catch (error) {
+      console.error("Failed to create request:", error);
+      alert("Failed to create request. Please try again.");
+    }
   };
 
   return (
