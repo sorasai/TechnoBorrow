@@ -17,6 +17,41 @@ const CreateRequestModal: React.FC<CreateRequestModalProps> = ({ onClose, onSucc
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
   const [duration, setDuration] = useState('');
+  const [itemImageBase64, setItemImageBase64] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (startDate && startTime && endDate && endTime) {
+      const start = new Date(`${startDate}T${startTime}`);
+      const end = new Date(`${endDate}T${endTime}`);
+      
+      const diffMs = end.getTime() - start.getTime();
+      if (diffMs < 0) {
+        setDuration('Invalid: End must be after Start');
+      } else {
+        const diffHrs = diffMs / (1000 * 60 * 60);
+        if (diffHrs > 24) {
+          setDuration(`Exceeds 24 hrs (${diffHrs.toFixed(1)} hrs)`);
+        } else {
+          setDuration(`${diffHrs.toFixed(1)} hours`);
+        }
+      }
+    } else {
+      setDuration('');
+    }
+  }, [startDate, startTime, endDate, endTime]);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        const base64Data = base64String.split(',')[1];
+        setItemImageBase64(base64Data);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +68,8 @@ const CreateRequestModal: React.FC<CreateRequestModalProps> = ({ onClose, onSucc
         description,
         purpose,
         startDate: `${startDate}T${startTime}:00`,
-        endDate: `${endDate}T${endTime}:00`
+        endDate: `${endDate}T${endTime}:00`,
+        itemImage: itemImageBase64
       };
 
       await borrowingApi.createRequest(payload);
@@ -179,9 +215,20 @@ const CreateRequestModal: React.FC<CreateRequestModalProps> = ({ onClose, onSucc
 
             <div className="modal-schedule-col">
               <label className="modal-label">Upload Image (Optional):</label>
-              <div className="modal-upload-area">
+              <div 
+                className="modal-upload-area" 
+                onClick={() => document.getElementById('imageUpload')?.click()}
+                style={{ cursor: 'pointer' }}
+              >
                 <Upload size={16} />
-                <span>Upload file</span>
+                <span>{itemImageBase64 ? 'Image Selected' : 'Upload file'}</span>
+                <input 
+                  type="file" 
+                  id="imageUpload" 
+                  accept="image/*" 
+                  style={{ display: 'none' }} 
+                  onChange={handleImageUpload}
+                />
               </div>
             </div>
           </div>

@@ -6,7 +6,12 @@ public class BorrowingRequestDTO {
     private Long id;
     private String itemName;
     private String description;
+    private String purpose;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private byte[] itemImage;
     private String requesterName;
+    private byte[] requesterImage;
     private LocalDateTime createdAt;
     private String status;
 
@@ -34,12 +39,32 @@ public class BorrowingRequestDTO {
         this.description = description;
     }
 
+    public String getPurpose() { return purpose; }
+    public void setPurpose(String purpose) { this.purpose = purpose; }
+
+    public LocalDateTime getStartDate() { return startDate; }
+    public void setStartDate(LocalDateTime startDate) { this.startDate = startDate; }
+
+    public LocalDateTime getEndDate() { return endDate; }
+    public void setEndDate(LocalDateTime endDate) { this.endDate = endDate; }
+
+    public byte[] getItemImage() { return itemImage; }
+    public void setItemImage(byte[] itemImage) { this.itemImage = itemImage; }
+
     public String getRequesterName() {
         return requesterName;
     }
 
     public void setRequesterName(String requesterName) {
         this.requesterName = requesterName;
+    }
+
+    public byte[] getRequesterImage() {
+        return requesterImage;
+    }
+
+    public void setRequesterImage(byte[] requesterImage) {
+        this.requesterImage = requesterImage;
     }
 
     public LocalDateTime getCreatedAt() {
