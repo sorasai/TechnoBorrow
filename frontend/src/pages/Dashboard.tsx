@@ -9,6 +9,7 @@ import StatsCards from "../components/dashboard/StatsCards";
 import SearchBar from "../components/dashboard/SearchBar";
 import EmptyState from "../components/dashboard/EmptyState";
 import RequestCard from "../components/dashboard/RequestCard";
+import RequestDetailsModal from "../components/dashboard/RequestDetailsModal";
 import { authApi } from "../api/auth";
 import { borrowingApi } from "../api/borrowing";
 import "../css/dashboard.css";
@@ -17,6 +18,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
   const [requests, setRequests] = useState<any[]>([]);
 
   const fetchRequests = useCallback(async () => {
@@ -96,8 +98,10 @@ function Dashboard() {
                     itemName={req.itemName}
                     description={req.description}
                     requesterName={req.requesterName}
+                    requesterImage={req.requesterImage}
                     createdAt={formatCreatedAt(req.createdAt)}
                     status={req.status}
+                    onViewDetails={() => setSelectedRequest(req)}
                   />
                 ))}
               </div>
@@ -113,6 +117,13 @@ function Dashboard() {
         <CreateRequestModal 
           onClose={() => setIsModalOpen(false)} 
           onSuccess={handleRequestCreated} 
+        />
+      )}
+
+      {selectedRequest && (
+        <RequestDetailsModal 
+          request={selectedRequest}
+          onClose={() => setSelectedRequest(null)}
         />
       )}
     </div>

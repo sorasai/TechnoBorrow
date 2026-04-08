@@ -9,6 +9,7 @@ public class CreateBorrowingRequestDTO {
     private String purpose;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private String itemImage;
 
     public Long getRequesterId() {
         return requesterId;
@@ -56,5 +57,13 @@ public class CreateBorrowingRequestDTO {
 
     public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
+    }
+
+    public String getItemImage() {
+        return itemImage;
+    }
+
+    public void setItemImage(String itemImage) {
+        this.itemImage = itemImage;
     }
 }

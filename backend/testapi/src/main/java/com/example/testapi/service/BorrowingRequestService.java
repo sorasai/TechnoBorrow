@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Base64;
 
 @Service
 public class BorrowingRequestService {
@@ -35,6 +36,10 @@ public class BorrowingRequestService {
         request.setEndDate(createDTO.getEndDate());
         request.setStatus("POSTED");
 
+        if (createDTO.getItemImage() != null && !createDTO.getItemImage().isEmpty()) {
+            request.setItemImage(Base64.getDecoder().decode(createDTO.getItemImage()));
+        }
+
         BorrowingRequest saved = borrowingRequestRepository.save(request);
         return mapToDTO(saved);
     }
@@ -51,7 +56,12 @@ public class BorrowingRequestService {
         dto.setId(request.getId());
         dto.setItemName(request.getItemName());
         dto.setDescription(request.getDescription());
+        dto.setPurpose(request.getPurpose());
+        dto.setStartDate(request.getStartDate());
+        dto.setEndDate(request.getEndDate());
+        dto.setItemImage(request.getItemImage());
         dto.setRequesterName(request.getRequester().getFullName());
+        dto.setRequesterImage(request.getRequester().getProfileImage());
         dto.setCreatedAt(request.getCreatedAt());
         dto.setStatus(request.getStatus());
         return dto;

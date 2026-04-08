@@ -5,16 +5,20 @@ interface RequestCardProps {
   itemName: string;
   description: string;
   requesterName: string;
+  requesterImage?: string;
   createdAt: string;
   status: string;
+  onViewDetails?: () => void;
 }
 
 const RequestCard: React.FC<RequestCardProps> = ({
   itemName,
   description,
   requesterName,
+  requesterImage,
   createdAt,
   status,
+  onViewDetails,
 }) => {
   // Simple helper to pick badge colors based on status
   const getStatusClass = (statusText: string) => {
@@ -33,35 +37,36 @@ const RequestCard: React.FC<RequestCardProps> = ({
   return (
     <div className="request-card">
       <div className="request-card-header">
-        <h3 className="request-card-title" title={itemName}>
-          {itemName}
-        </h3>
-        <span
-          className={`request-card-status ${getStatusClass(status)}`}
-        >
+        <div className="request-card-user-info">
+          <div className="request-card-avatar">
+            <img 
+              src={requesterImage ? `data:image/jpeg;base64,${requesterImage}` : `https://ui-avatars.com/api/?name=${requesterName.replace(' ', '+')}&background=random`} 
+              alt={requesterName} 
+            />
+          </div>
+          <div className="request-card-user-meta">
+            <span className="request-card-requester">{requesterName}</span>
+            <span className="request-card-date">{createdAt}</span>
+          </div>
+        </div>
+        <span className={`request-card-status ${getStatusClass(status)}`}>
           {status}
         </span>
       </div>
 
-      <div className="request-card-user-info">
-        <div className="request-card-avatar">
-          <img src={`https://ui-avatars.com/api/?name=${requesterName.replace(' ', '+')}&background=random`} alt={requesterName} />
-        </div>
-        <span className="request-card-requester">{requesterName}</span>
+      <div className="request-card-body">
+        <h3 className="request-card-title" title={itemName}>
+          {itemName}
+        </h3>
+        <p className="request-card-description" title={description}>
+          {description}
+        </p>
       </div>
-      
-      <p className="request-card-date">Posted {createdAt}</p>
-
-      <div className="request-card-divider" />
-
-      <p className="request-card-description" title={description}>
-        {description}
-      </p>
 
       <div className="request-card-divider" />
 
       <div className="request-card-footer">
-        <button className="request-card-action-btn">
+        <button className="request-card-action-btn" onClick={onViewDetails}>
           View Details &gt;
         </button>
       </div>
