@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import LandingPage from "./pages/LandingPage";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
+import LandingPage from "./features/landing/LandingPage";
+import LoginPage from "./features/auth/LoginPage";
+import RegisterPage from "./features/auth/RegisterPage";
+import DashboardPage from "./features/dashboard/DashboardPage";
+import ProfilePage from "./features/profile/ProfilePage";
 
 function App() {
   return (
@@ -11,10 +11,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/landing" replace />} />
         <Route path="/landing" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
   );
