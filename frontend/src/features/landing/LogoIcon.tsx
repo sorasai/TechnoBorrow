@@ -1,4 +1,4 @@
-import logo from "../../assets/TechnoBorrow_logo.png";
+import logo from "../../shared/assets/TechnoBorrow_logo.png";
 
 const LogoIcon = () => (
     <img

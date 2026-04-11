@@ -1,13 +1,13 @@
-import "../css/landing.css";
-import NavSection from "../components/landing/NavSection";
-import HeroSection from "../components/landing/HeroSection";
-import WhatIsSection from "../components/landing/WhatIsSection";
-import CorePrinciplesSection from "../components/landing/CorePrinciplesSection";
-import HowItWorksSection from "../components/landing/HowItWorksSection";
-import PlatformFeaturesSection from "../components/landing/PlatformFeaturesSection";
-import AboutSection from "../components/landing/AboutSection";
-import CTASection from "../components/landing/CTASection";
-import FooterSection from "../components/landing/FooterSection";
+import "./landing.css";
+import NavSection from "./NavSection";
+import HeroSection from "./HeroSection";
+import WhatIsSection from "./WhatIsSection";
+import CorePrinciplesSection from "./CorePrinciplesSection";
+import HowItWorksSection from "./HowItWorksSection";
+import PlatformFeaturesSection from "./PlatformFeaturesSection";
+import AboutSection from "./AboutSection";
+import CTASection from "./CTASection";
+import FooterSection from "./FooterSection";
 
 const LandingPage: React.FC = () => {
     const scrollTo = (id: string) => {

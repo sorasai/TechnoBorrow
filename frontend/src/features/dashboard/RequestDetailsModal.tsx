@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Calendar, Clock, MapPin, Target } from 'lucide-react';
+import { X, Calendar, Clock, Target } from 'lucide-react';
 
 interface RequestDetailsModalProps {
   request: any;
@@ -9,7 +9,6 @@ interface RequestDetailsModalProps {
 const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onClose }) => {
   if (!request) return null;
 
-  // Format dates
   const startDate = new Date(request.startDate);
   const endDate = new Date(request.endDate);
   const postedDate = new Date(request.createdAt);
@@ -23,16 +22,13 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
   const endStr = endDate.toLocaleString('en-US', formatOptions);
   const postedStr = postedDate.toLocaleString('en-US', formatOptions);
 
-  // Calculate duration
   const diffMs = endDate.getTime() - startDate.getTime();
   const diffHrs = diffMs > 0 ? (diffMs / (1000 * 60 * 60)).toFixed(1) : 0;
 
-  // User image
   const userImageSrc = request.requesterImage 
     ? `data:image/jpeg;base64,${request.requesterImage}` 
     : `https://ui-avatars.com/api/?name=${request.requesterName?.replace(' ', '+')}&background=random`;
 
-  // Item image
   const itemImageSrc = request.itemImage 
     ? `data:image/jpeg;base64,${request.itemImage}` 
     : null;

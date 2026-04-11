@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { authApi } from "../../api/auth";
+import { authApi } from "../auth/api";
 
 interface ProfilePhotoSectionProps {
     initialAvatarUrl: string | null | undefined;
@@ -15,14 +15,12 @@ export const ProfilePhotoSection: React.FC<ProfilePhotoSectionProps> = ({ initia
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Reset input so the same file can be re-selected if needed
         e.target.value = "";
 
         setAvatarMsg(null);
         setUploadingAvatar(true);
 
         try {
-            // 1. Convert file → data URL
             const dataUrl = await new Promise<string>((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => resolve(reader.result as string);
@@ -30,7 +28,6 @@ export const ProfilePhotoSection: React.FC<ProfilePhotoSectionProps> = ({ initia
                 reader.readAsDataURL(file);
             });
 
-            // 2. Draw onto a canvas and resize to max 256×256
             const compressed = await new Promise<string>((resolve, reject) => {
                 const img = new Image();
                 img.onload = () => {
@@ -53,11 +50,9 @@ export const ProfilePhotoSection: React.FC<ProfilePhotoSectionProps> = ({ initia
                 img.src = dataUrl;
             });
 
-            // 3. Send file to backend
             const user = authApi.getCurrentUser();
             if (!user?.id) throw new Error("No active session.");
 
-            // Convert canvas dataUrl back to a File to send to backend
             const res = await fetch(compressed);
             const blob = await res.blob();
             const compressedFile = new File([blob], "avatar.jpg", { type: "image/jpeg" });

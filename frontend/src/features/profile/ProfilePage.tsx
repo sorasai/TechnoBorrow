@@ -1,21 +1,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "../api/auth";
-import "../css/profile.css";
-import { ProfilePhotoSection } from "../components/profile/ProfilePhotoSection";
-import { EditProfileForm } from "../components/profile/EditProfileForm";
-import { ChangePasswordForm } from "../components/profile/ChangePasswordForm";
-import Sidebar from "../components/ui/Sidebar";
 import { User } from "lucide-react";
-import Header from "../components/ui/Header";
+import { authApi } from "../auth/api";
+import { ProfilePhotoSection } from "./ProfilePhotoSection";
+import { EditProfileForm } from "./EditProfileForm";
+import { ChangePasswordForm } from "./ChangePasswordForm";
+import Sidebar from "../../shared/ui/Sidebar";
+import Header from "../../shared/ui/Header";
+import "./profile.css";
 
-function Profile() {
+function ProfilePage() {
     const navigate = useNavigate();
 
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    // ── Load current user on mount ───────────────────────────────
     useEffect(() => {
         const loadUser = () => {
             const user = authApi.getCurrentUser();
@@ -45,9 +44,7 @@ function Profile() {
                     onProfileClick={() => navigate("/profile")}
                 />
 
-                {/* Content */}
                 <main className="profile-content">
-                    {/* Page Heading */}
                     <div className="profile-header">
                         <div className="profile-header__title-wrapper">
                             <div className="profile-header__icon">
@@ -75,4 +72,4 @@ function Profile() {
     );
 }
 
-export default Profile;
+export default ProfilePage;

@@ -1,10 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "../api/auth";
-import "../css/auth.css";
-import LoginForm from "../components/auth/LoginForm";
+import { authApi } from "./api";
+import "./auth.css";
+import LoginForm from "./LoginForm";
 
-function Login() {
+function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,7 +13,6 @@ function Login() {
   const handleLogin = async () => {
     setError("");
 
-    // Validate empty fields
     if (!email || !password) {
       setError("Please fill in all fields.");
       return;
@@ -43,11 +42,11 @@ function Login() {
       email={email}
       password={password}
       error={error}
-      onEmailChange={(e) => setEmail(e.target.value)}
-      onPasswordChange={(e) => setPassword(e.target.value)}
+      onEmailChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+      onPasswordChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
       onSubmit={handleLogin}
     />
   );
 }
 
-export default Login;
+export default LoginPage;

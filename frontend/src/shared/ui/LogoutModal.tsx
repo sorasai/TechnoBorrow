@@ -1,7 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { LogOut } from 'lucide-react';
-import '../../css/logout-modal.css';
+import './logout-modal.css';
 
 interface LogoutModalProps {
   isOpen: boolean;

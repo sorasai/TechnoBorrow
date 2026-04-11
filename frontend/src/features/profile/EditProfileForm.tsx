@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { authApi } from "../../api/auth";
-import { InputField } from "../ui/InputField";
-import { Button } from "../ui/Button";
+import { authApi } from "../auth/api";
+import { InputField } from "../../shared/ui/InputField";
+import { Button } from "../../shared/ui/Button";
 
 interface EditProfileFormProps {
     initialFullName: string;
@@ -23,7 +23,6 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ initialFullNam
             const response = await authApi.editProfile(user.id, { fullName });
             
             if (typeof response === "string" && response === "Profile Updated") {
-                // Update local session
                 user.fullName = fullName;
                 authApi.setCurrentUser(user);
                 setProfileMsg({ type: "success", text: "Profile updated successfully." });

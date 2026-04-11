@@ -8,9 +8,9 @@ import {
   LogOut, 
   X 
 } from "lucide-react";
-import { authApi } from "../../api/auth";
-import "../../css/sidebar.css";
-import TechnoBorrowLogo from "../../assets/TechnoBorrow_logo.png";
+import { authApi } from "../../features/auth/api";
+import "./sidebar.css";
+import TechnoBorrowLogo from "../assets/TechnoBorrow_logo.png";
 import LogoutModal from "./LogoutModal";
 
 function Sidebar() {

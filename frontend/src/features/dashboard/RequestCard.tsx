@@ -1,5 +1,4 @@
 import React from "react";
-import { User } from "lucide-react";
 
 interface RequestCardProps {
   itemName: string;
@@ -20,7 +19,6 @@ const RequestCard: React.FC<RequestCardProps> = ({
   status,
   onViewDetails,
 }) => {
-  // Simple helper to pick badge colors based on status
   const getStatusClass = (statusText: string) => {
     switch (statusText.toLowerCase()) {
       case "posted":

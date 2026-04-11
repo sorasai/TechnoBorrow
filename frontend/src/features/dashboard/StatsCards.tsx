@@ -4,7 +4,6 @@ import { ClipboardList, RefreshCw, Package } from 'lucide-react';
 const StatsCards: React.FC = () => {
   return (
     <div className="dashboard-stats-grid">
-      {/* Card 1 */}
       <div className="dashboard-stat-card">
         <div className="dashboard-stat-icon-wrapper yellow">
           <ClipboardList size={24} color="#FFFFFF" />
@@ -17,7 +16,6 @@ const StatsCards: React.FC = () => {
         </div>
       </div>
 
-      {/* Card 2 (Active/Bordered) */}
       <div className="dashboard-stat-card">
         <div className="dashboard-stat-icon-wrapper orange">
           <RefreshCw size={24} color="#FFFFFF" />
@@ -30,7 +28,6 @@ const StatsCards: React.FC = () => {
         </div>
       </div>
 
-      {/* Card 3 */}
       <div className="dashboard-stat-card">
         <div className="dashboard-stat-icon-wrapper green">
           <Package size={24} color="#FFFFFF" />

@@ -1,20 +1,20 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
-import Sidebar from "../components/ui/Sidebar";
-import CreateRequestModal from "../components/dashboard/CreateRequestModal";
-import Header from "../components/ui/Header";
-import DashboardWelcome from "../components/dashboard/DashboardWelcome";
-import StatsCards from "../components/dashboard/StatsCards";
-import SearchBar from "../components/dashboard/SearchBar";
-import EmptyState from "../components/dashboard/EmptyState";
-import RequestCard from "../components/dashboard/RequestCard";
-import RequestDetailsModal from "../components/dashboard/RequestDetailsModal";
-import { authApi } from "../api/auth";
-import { borrowingApi } from "../api/borrowing";
-import "../css/dashboard.css";
+import { authApi } from "../auth/api";
+import { borrowingApi } from "./api";
+import Sidebar from "../../shared/ui/Sidebar";
+import Header from "../../shared/ui/Header";
+import CreateRequestModal from "./CreateRequestModal";
+import DashboardWelcome from "./DashboardWelcome";
+import StatsCards from "./StatsCards";
+import SearchBar from "./SearchBar";
+import EmptyState from "./EmptyState";
+import RequestCard from "./RequestCard";
+import RequestDetailsModal from "./RequestDetailsModal";
+import "./dashboard.css";
 
-function Dashboard() {
+function DashboardPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -130,4 +130,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default DashboardPage;

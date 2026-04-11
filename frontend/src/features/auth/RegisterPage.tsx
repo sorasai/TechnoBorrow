@@ -1,10 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "../api/auth";
-import "../css/auth.css";
-import RegisterForm from "../components/auth/RegisterForm";
+import { authApi } from "./api";
+import "./auth.css";
+import RegisterForm from "./RegisterForm";
 
-function Register() {
+function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,13 +16,11 @@ function Register() {
   const handleRegister = async () => {
     setError("");
 
-    // Validate empty fields
     if (!fullName || !email || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       return;
     }
 
-    // Validate password match
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -55,14 +53,14 @@ function Register() {
       confirmPassword={confirmPassword}
       agreed={agreed}
       error={error}
-      onFullNameChange={(e) => setFullName(e.target.value)}
-      onEmailChange={(e) => setEmail(e.target.value)}
-      onPasswordChange={(e) => setPassword(e.target.value)}
-      onConfirmPasswordChange={(e) => setConfirmPassword(e.target.value)}
-      onAgreedChange={(e) => setAgreed(e.target.checked)}
+      onFullNameChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
+      onEmailChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+      onPasswordChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+      onConfirmPasswordChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+      onAgreedChange={(e: React.ChangeEvent<HTMLInputElement>) => setAgreed(e.target.checked)}
       onSubmit={handleRegister}
     />
   );
 }
 
-export default Register;
+export default RegisterPage;

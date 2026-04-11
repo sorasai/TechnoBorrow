@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Upload } from 'lucide-react';
-import { authApi } from '../../api/auth';
-import { borrowingApi } from '../../api/borrowing';
+import { authApi } from '../auth/api';
+import { borrowingApi } from './api';
 
 interface CreateRequestModalProps {
   onClose: () => void;

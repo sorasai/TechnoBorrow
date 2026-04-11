@@ -1,3 +1,4 @@
+import React from "react";
 interface AuthInputProps {
     label: string;
     type: string;

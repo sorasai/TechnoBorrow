@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { authApi } from "../../api/auth";
-import { InputField } from "../ui/InputField";
-import { Button } from "../ui/Button";
+import { authApi } from "../auth/api";
+import { InputField } from "../../shared/ui/InputField";
+import { Button } from "../../shared/ui/Button";
 
 export const ChangePasswordForm: React.FC = () => {
     const [currentPassword, setCurrentPassword] = useState("");

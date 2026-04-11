@@ -1,5 +1,6 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/TechnoBorrow_logo.png";
+import logo from "../../shared/assets/TechnoBorrow_logo.png";
 
 interface AuthCardProps {
     children: React.ReactNode;
