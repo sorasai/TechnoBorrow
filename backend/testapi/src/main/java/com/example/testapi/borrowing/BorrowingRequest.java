@@ -1,5 +1,6 @@
-package com.example.testapi.model;
+package com.example.testapi.borrowing;
 
+import com.example.testapi.auth.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 

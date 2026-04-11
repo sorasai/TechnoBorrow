@@ -1,6 +1,5 @@
-package com.example.testapi.repository;
+package com.example.testapi.borrowing;
 
-import com.example.testapi.model.BorrowingRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

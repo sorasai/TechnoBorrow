@@ -1,4 +1,4 @@
-package com.example.testapi.dto;
+package com.example.testapi.borrowing;
 
 import java.time.LocalDateTime;
 

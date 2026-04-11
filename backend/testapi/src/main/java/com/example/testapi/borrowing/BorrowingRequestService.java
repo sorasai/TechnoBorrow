@@ -1,11 +1,7 @@
-package com.example.testapi.service;
+package com.example.testapi.borrowing;
 
-import com.example.testapi.dto.BorrowingRequestDTO;
-import com.example.testapi.dto.CreateBorrowingRequestDTO;
-import com.example.testapi.model.BorrowingRequest;
-import com.example.testapi.model.User;
-import com.example.testapi.repository.BorrowingRequestRepository;
-import com.example.testapi.repository.UserRepository;
+import com.example.testapi.auth.User;
+import com.example.testapi.auth.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

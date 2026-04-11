@@ -1,8 +1,5 @@
-package com.example.testapi.controller;
+package com.example.testapi.borrowing;
 
-import com.example.testapi.dto.BorrowingRequestDTO;
-import com.example.testapi.dto.CreateBorrowingRequestDTO;
-import com.example.testapi.service.BorrowingRequestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
