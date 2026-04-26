@@ -1,12 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Calendar, Clock, Target } from 'lucide-react';
+import { authApi } from '../auth/api';
+import { borrowingApi } from './api';
 
 interface RequestDetailsModalProps {
   request: any;
   onClose: () => void;
+  onOfferSuccess?: (message: string) => void;
+  initialTab?: string;
 }
 
-const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onClose }) => {
+const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onClose, onOfferSuccess, initialTab }) => {
+  const [offers, setOffers] = useState<any[]>([]);
+  const [offering, setOffering] = useState(false);
+  const currentUser = authApi.getCurrentUser();
+
+  useEffect(() => {
+    if (request && request.id) {
+      borrowingApi.getOffersForRequest(request.id)
+        .then((data) => {
+          // Sort newest first (descending by createdAt)
+          const sortedOffers = data.sort((a: any, b: any) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+          setOffers(sortedOffers);
+        })
+        .catch(console.error);
+    }
+  }, [request]);
+
   if (!request) return null;
 
   const startDate = new Date(request.startDate);
@@ -32,6 +54,27 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
   const itemImageSrc = request.itemImage 
     ? `data:image/jpeg;base64,${request.itemImage}` 
     : null;
+
+  const handleOffer = async () => {
+    if (!currentUser) return;
+    try {
+      setOffering(true);
+      await borrowingApi.createOffer(request.id, currentUser.id, "I can lend this item.");
+      if (onOfferSuccess) onOfferSuccess("Offer submitted successfully!");
+      onClose(); // Close modal on success
+    } catch (err: any) {
+      alert(err.response?.data || 'Failed to submit offer.');
+    } finally {
+      setOffering(false);
+    }
+  };
+
+  const isOwnRequest = currentUser && request.requesterId === currentUser.id;
+  const isPosted = request.status === 'POSTED';
+  const hasOffered = currentUser && offers.some(o => o.lenderId === currentUser.id);
+  const hasAcceptedOffer = offers.some(o => o.status === 'ACCEPTED');
+
+  const showOfferButton = !isOwnRequest && isPosted && !hasOffered && !hasAcceptedOffer;
 
   return (
     <div className="modal-overlay">
@@ -59,6 +102,29 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
               <h3 className="rd-item-name">{request.itemName}</h3>
               <p className="rd-description">{request.description}</p>
             </div>
+
+            {/* Offers Received Section for Requester */}
+            {isOwnRequest && isPosted && (
+              <div className={`rd-offers-section ${initialTab === 'offers' ? 'highlight-section' : ''}`}>
+                <h4 className="rd-section-subtitle">Offers Received</h4>
+                <div className="rd-offers-list">
+                  {offers.length > 0 ? (
+                    <ul className="rd-offers-ul">
+                      {offers.map((offer) => (
+                        <li key={offer.id} className="rd-offer-item">
+                          <span className="rd-lender-name">{offer.lenderName}</span>
+                          <span className="rd-offer-time" style={{ fontSize: '12px', color: '#6B7280' }}>
+                            {new Date(offer.createdAt).toLocaleString('en-US', formatOptions)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="rd-no-offers-text">No offers yet</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="rd-right-col">
@@ -98,9 +164,11 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
             </div>
 
             <div className="rd-footer-integrated">
-              <button type="button" className="rd-lend-btn" onClick={() => alert('Lend feature coming soon!')}>
-                Offer to Lend
-              </button>
+              {showOfferButton && (
+                <button type="button" className="rd-lend-btn" onClick={handleOffer} disabled={offering}>
+                  {offering ? 'Submitting...' : 'Offer to Lend'}
+                </button>
+              )}
             </div>
           </div>
         </div>

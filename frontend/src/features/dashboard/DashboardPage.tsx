@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, CheckCircle, Info, Bell } from "lucide-react";
 import { authApi } from "../auth/api";
 import { borrowingApi } from "./api";
 import Sidebar from "../../shared/ui/Sidebar";
@@ -19,12 +19,54 @@ function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
+  const [initialTab, setInitialTab] = useState<string | undefined>(undefined);
   const [requests, setRequests] = useState<any[]>([]);
+  const requestsRef = React.useRef<any[]>([]);
+  const [toasts, setToasts] = useState<any[]>([]);
 
-  const fetchRequests = useCallback(async () => {
+  // Update ref whenever requests state changes
+  useEffect(() => {
+    requestsRef.current = requests;
+  }, [requests]);
+
+  const showToast = (message: string, type: 'success' | 'info' | 'warning' = 'success') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.map(t => t.id === id ? { ...t, fading: true } : t));
+      setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+      }, 300);
+    }, 6000);
+  };
+
+  const fetchRequests = useCallback(async (isInitial = false) => {
     try {
       const data = await borrowingApi.getAllRequests();
-      setRequests(data);
+      const currentUser = authApi.getCurrentUser();
+      
+      if (currentUser) {
+        // Detect new offers for borrower using ref to avoid stale closure
+        if (!isInitial && requestsRef.current.length > 0) {
+          data.forEach((newReq: any) => {
+            const oldReq = requestsRef.current.find(r => r.id === newReq.id);
+            if (oldReq && newReq.requesterId === currentUser.id && newReq.offerCount > oldReq.offerCount) {
+              showToast(`You have received a new offer for "${newReq.itemName}"!`, 'info');
+            }
+          });
+        }
+
+        const sortedData = [...data].sort((a, b) => {
+          const isAOwner = a.requesterId === currentUser.id;
+          const isBOwner = b.requesterId === currentUser.id;
+          if (isAOwner && !isBOwner) return -1;
+          if (!isAOwner && isBOwner) return 1;
+          return 0;
+        });
+        setRequests(sortedData);
+      } else {
+        setRequests(data);
+      }
     } catch (error) {
       console.error("Failed to fetch requests", error);
     }
@@ -40,12 +82,29 @@ function DashboardPage() {
       setUser(currentUser);
     };
     loadUser();
-    fetchRequests();
+    fetchRequests(true);
+
+    // Auto-refresh every 10 seconds (faster for testing) to catch new offers
+    const interval = setInterval(() => {
+      fetchRequests();
+    }, 10000);
+    return () => clearInterval(interval);
   }, [navigate, fetchRequests]);
 
   const handleRequestCreated = () => {
+    showToast("Request created successfully!");
     fetchRequests();
     setIsModalOpen(false);
+  };
+
+  const handleViewDetails = (request: any) => {
+    setInitialTab(undefined);
+    setSelectedRequest(request);
+  };
+
+  const handleViewOffers = (request: any) => {
+    setInitialTab("offers");
+    setSelectedRequest(request);
   };
 
   const avatarUrl = user?.profileImage ? `data:image/jpeg;base64,${user.profileImage}` : undefined;
@@ -101,7 +160,10 @@ function DashboardPage() {
                     requesterImage={req.requesterImage}
                     createdAt={formatCreatedAt(req.createdAt)}
                     status={req.status}
-                    onViewDetails={() => setSelectedRequest(req)}
+                    offerCount={req.offerCount}
+                    isOwner={user && req.requesterId === user.id}
+                    onViewDetails={() => handleViewDetails(req)}
+                    onViewOffers={() => handleViewOffers(req)}
                   />
                 ))}
               </div>
@@ -124,8 +186,24 @@ function DashboardPage() {
         <RequestDetailsModal 
           request={selectedRequest}
           onClose={() => setSelectedRequest(null)}
+          onOfferSuccess={(msg) => showToast(msg, 'success')}
+          initialTab={initialTab}
         />
       )}
+
+      {/* Toast Notifications */}
+      <div className="toast-container">
+        {toasts.map(toast => (
+          <div key={toast.id} className={`toast ${toast.type} ${toast.fading ? 'toast-fade-out' : ''}`}>
+            <div className="toast-icon">
+              {toast.type === 'success' && <CheckCircle size={20} color="#22C55E" />}
+              {toast.type === 'info' && <Bell size={20} color="#3B82F6" />}
+              {toast.type === 'warning' && <Info size={20} color="#FBBF24" />}
+            </div>
+            <div className="toast-message">{toast.message}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

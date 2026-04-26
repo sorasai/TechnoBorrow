@@ -14,6 +14,24 @@ public class BorrowingRequestDTO {
     private byte[] requesterImage;
     private LocalDateTime createdAt;
     private String status;
+    private Long requesterId;
+    private int offerCount;
+
+    public int getOfferCount() {
+        return offerCount;
+    }
+
+    public void setOfferCount(int offerCount) {
+        this.offerCount = offerCount;
+    }
+
+    public Long getRequesterId() {
+        return requesterId;
+    }
+
+    public void setRequesterId(Long requesterId) {
+        this.requesterId = requesterId;
+    }
 
     public Long getId() {
         return id;

@@ -13,10 +13,12 @@ public class BorrowingRequestService {
 
     private final BorrowingRequestRepository borrowingRequestRepository;
     private final UserRepository userRepository;
+    private final com.example.testapi.offer.OfferRepository offerRepository;
 
-    public BorrowingRequestService(BorrowingRequestRepository borrowingRequestRepository, UserRepository userRepository) {
+    public BorrowingRequestService(BorrowingRequestRepository borrowingRequestRepository, UserRepository userRepository, com.example.testapi.offer.OfferRepository offerRepository) {
         this.borrowingRequestRepository = borrowingRequestRepository;
         this.userRepository = userRepository;
+        this.offerRepository = offerRepository;
     }
 
     public BorrowingRequestDTO createRequest(CreateBorrowingRequestDTO createDTO) {
@@ -57,9 +59,11 @@ public class BorrowingRequestService {
         dto.setEndDate(request.getEndDate());
         dto.setItemImage(request.getItemImage());
         dto.setRequesterName(request.getRequester().getFullName());
+        dto.setRequesterId(request.getRequester().getId());
         dto.setRequesterImage(request.getRequester().getProfileImage());
         dto.setCreatedAt(request.getCreatedAt());
         dto.setStatus(request.getStatus());
+        dto.setOfferCount((int) offerRepository.countByBorrowingRequestId(request.getId()));
         return dto;
     }
 }
