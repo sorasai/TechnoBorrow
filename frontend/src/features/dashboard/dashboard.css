@@ -854,3 +854,165 @@ hr.modal-divider {
     grid-template-columns: 1fr;
   }
 }
+
+
+.request-card.has-offers {
+  border: 1px solid #F4B41A;
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFFDF5 100%);
+  box-shadow: 0 4px 12px rgba(244, 180, 26, 0.1);
+}
+
+.request-card-offers-btn {
+  font-size: 14px;
+  font-weight: 600;
+  color: #B45309;
+  background-color: #FEF3C7;
+  border: 1px solid #FDE68A;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  margin-right: 8px;
+}
+
+.request-card-offers-btn:hover {
+  background-color: #FBBF24;
+  color: #92400E;
+  transform: translateY(-1px);
+}
+
+.rd-offers-section {
+  margin-top: 32px;
+  padding: 20px;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+}
+
+.rd-offers-section.highlight-section {
+  border-color: #F4B41A;
+  box-shadow: 0 0 0 2px rgba(244, 180, 26, 0.2);
+  animation: section-pulse 2s infinite;
+}
+
+@keyframes section-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(244, 180, 26, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(244, 180, 26, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(244, 180, 26, 0); }
+}
+
+.rd-section-subtitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 16px 0;
+}
+
+.rd-offers-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.rd-offers-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rd-offer-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #F3F4F6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rd-offer-item:last-child {
+  border-bottom: none;
+}
+
+.rd-lender-name {
+  font-weight: 600;
+  color: #374151;
+}
+
+.rd-no-offers-text {
+  color: #6B7280;
+  font-style: italic;
+  font-size: 14px;
+}
+
+/* Toast Notification */
+.toast-container {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.toast {
+  background-color: #FFFFFF;
+  color: #374151;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px;
+  border-left: 4px solid #7A1E2D;
+  animation: toast-slide-in 0.3s ease-out forwards;
+  pointer-events: auto;
+}
+
+.toast.success {
+  border-left-color: #22C55E;
+}
+
+.toast.info {
+  border-left-color: #3B82F6;
+}
+
+.toast.warning {
+  border-left-color: #FBBF24;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+}
+
+.toast-message {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast-fade-out {
+  animation: toast-fade-out 0.3s ease-in forwards !important;
+}
+
+@keyframes toast-fade-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+

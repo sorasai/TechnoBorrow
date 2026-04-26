@@ -7,7 +7,10 @@ interface RequestCardProps {
   requesterImage?: string;
   createdAt: string;
   status: string;
+  offerCount?: number;
+  isOwner?: boolean;
   onViewDetails?: () => void;
+  onViewOffers?: () => void;
 }
 
 const RequestCard: React.FC<RequestCardProps> = ({
@@ -17,7 +20,10 @@ const RequestCard: React.FC<RequestCardProps> = ({
   requesterImage,
   createdAt,
   status,
+  offerCount = 0,
+  isOwner = false,
   onViewDetails,
+  onViewOffers,
 }) => {
   const getStatusClass = (statusText: string) => {
     switch (statusText.toLowerCase()) {
@@ -32,8 +38,12 @@ const RequestCard: React.FC<RequestCardProps> = ({
     }
   };
 
+  const hasOffers = offerCount > 0;
+  const isPosted = status.toUpperCase() === "POSTED";
+  const showOwnerFeatures = isOwner && hasOffers && isPosted;
+
   return (
-    <div className="request-card">
+    <div className={`request-card ${isOwner && hasOffers ? 'has-offers' : ''}`}>
       <div className="request-card-header">
         <div className="request-card-user-info">
           <div className="request-card-avatar">
@@ -64,6 +74,11 @@ const RequestCard: React.FC<RequestCardProps> = ({
       <div className="request-card-divider" />
 
       <div className="request-card-footer">
+        {showOwnerFeatures && (
+          <button className="request-card-offers-btn" onClick={onViewOffers}>
+            View Offers ({offerCount})
+          </button>
+        )}
         <button className="request-card-action-btn" onClick={onViewDetails}>
           View Details &gt;
         </button>

@@ -28,5 +28,35 @@ export const borrowingApi = {
             console.error('Error fetching borrowing requests:', error);
             throw error;
         }
+    },
+
+    /**
+     * Create an offer for a request
+     */
+    createOffer: async (requestId: number, lenderId: number, message: string) => {
+        try {
+            const response = await axios.post(`http://localhost:8080/api/offers`, {
+                requestId,
+                lenderId,
+                message
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error creating offer:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get offers for a specific request
+     */
+    getOffersForRequest: async (requestId: number) => {
+        try {
+            const response = await axios.get(`http://localhost:8080/api/offers/request/${requestId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching offers for request:', error);
+            throw error;
+        }
     }
 };
