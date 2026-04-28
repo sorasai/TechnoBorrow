@@ -23,7 +23,7 @@ export const borrowingApi = {
     getAllRequests: async () => {
         try {
             const response = await axios.get(API_BASE_URL);
-            return response.data;
+            return response.data.map((req: any) => req.status === 'ONGOING' ? { ...req, status: 'MATCHED' } : req);
         } catch (error) {
             console.error('Error fetching borrowing requests:', error);
             throw error;
@@ -56,6 +56,32 @@ export const borrowingApi = {
             return response.data;
         } catch (error) {
             console.error('Error fetching offers for request:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get offers made by a user
+     */
+    getOffersForUser: async (userId: number) => {
+        try {
+            const response = await axios.get(`http://localhost:8080/api/offers/user/${userId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching user offers:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Accept an offer
+     */
+    acceptOffer: async (offerId: number) => {
+        try {
+            const response = await axios.post(`http://localhost:8080/api/offers/${offerId}/accept`);
+            return response.data;
+        } catch (error) {
+            console.error('Error accepting offer:', error);
             throw error;
         }
     }

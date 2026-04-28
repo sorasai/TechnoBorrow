@@ -1,10 +1,21 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ClipboardList, RefreshCw, Package } from 'lucide-react';
 
-const StatsCards: React.FC = () => {
+interface StatsCardsProps {
+  hasOngoingTransactions?: boolean;
+}
+
+const StatsCards: React.FC<StatsCardsProps> = ({ hasOngoingTransactions = false }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="dashboard-stats-grid">
-      <div className="dashboard-stat-card">
+      <div 
+        className="dashboard-stat-card clickable-card" 
+        onClick={() => navigate('/my-requests')}
+        style={{ cursor: 'pointer' }}
+      >
         <div className="dashboard-stat-icon-wrapper yellow">
           <ClipboardList size={24} color="#FFFFFF" />
         </div>
@@ -16,14 +27,18 @@ const StatsCards: React.FC = () => {
         </div>
       </div>
 
-      <div className="dashboard-stat-card">
+      <div 
+        className={`dashboard-stat-card clickable-card ${hasOngoingTransactions ? 'highlighted-card' : ''}`}
+        onClick={() => navigate('/my-transactions')}
+        style={{ cursor: 'pointer' }}
+      >
         <div className="dashboard-stat-icon-wrapper orange">
           <RefreshCw size={24} color="#FFFFFF" />
         </div>
         <div>
           <h3 className="dashboard-stat-title">Ongoing Transactions</h3>
           <p className="dashboard-stat-desc">
-            Active borrowing or lending transactions that require monitoring or action.
+            Active lending transactions that require monitoring or action.
           </p>
         </div>
       </div>

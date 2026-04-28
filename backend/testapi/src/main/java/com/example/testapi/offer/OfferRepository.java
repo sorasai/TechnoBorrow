@@ -18,4 +18,8 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
     boolean existsByBorrowingRequestAndStatus(BorrowingRequest borrowingRequest, String status);
 
     long countByBorrowingRequestId(Long borrowingRequestId);
+
+    List<Offer> findByLenderIdOrderByCreatedAtDesc(Long lenderId);
+
+    List<Offer> findByBorrowingRequest(BorrowingRequest request);
 }

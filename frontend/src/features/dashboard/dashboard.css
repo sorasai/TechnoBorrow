@@ -107,11 +107,24 @@
   gap: 16px;
   background-color: #FFFFFF;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+}
+
+.clickable-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #D1D5DB;
 }
 
 .dashboard-stat-card.active {
   border: 2px solid #3B82F6;
   box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+}
+
+.highlighted-card {
+  border: 2px solid #F97316;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
+  background-color: #FFF7ED;
 }
 
 .dashboard-stat-icon-wrapper {
@@ -513,6 +526,12 @@ hr.modal-divider {
   border: 1px solid #FDE68A;
 }
 
+.status-badge-matched {
+  background-color: #FDE8E8;
+  color: #7A1E2D;
+  border: 1px solid #FBD5D5;
+}
+
 .status-badge-pending {
   background-color: #DBEAFE;
   color: #1D4ED8;
@@ -842,6 +861,24 @@ hr.modal-divider {
   box-shadow: 0 4px 6px -1px rgba(122, 30, 45, 0.2);
 }
 
+.rd-accept-btn {
+  padding: 6px 16px;
+  background-color: #7A1E2D;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rd-accept-btn:hover {
+  background-color: #5A0F1B;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(122, 30, 45, 0.2);
+}
+
 /* Responsive requests grid */
 @media (max-width: 1024px) {
   .requests-grid {
@@ -1014,5 +1051,94 @@ hr.modal-divider {
     transform: translateX(100%);
     opacity: 0;
   }
+}
+
+/* Stepper styles */
+.stepper-container {
+  margin: 32px 0 24px 0;
+  padding: 0 20px;
+}
+
+.stepper-wrapper {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.stepper-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  right: 20px;
+  height: 3px;
+  background-color: #E5E7EB;
+  z-index: 1;
+}
+
+.stepper-progress-bar {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  height: 3px;
+  background-color: #7A1E2D;
+  z-index: 2;
+  transition: width 0.4s ease;
+}
+
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 3;
+  position: relative;
+  width: 80px;
+}
+
+.stepper-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  border: 3px solid #E5E7EB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #9CA3AF;
+  transition: all 0.3s ease;
+}
+
+.stepper-step.active .stepper-circle {
+  border-color: #7A1E2D;
+  color: #7A1E2D;
+  background-color: #FDE8E8;
+}
+
+.stepper-step.completed .stepper-circle {
+  background-color: #7A1E2D;
+  border-color: #7A1E2D;
+  color: #FFFFFF;
+}
+
+.stepper-label {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.stepper-step.active .stepper-label {
+  color: #7A1E2D;
+  font-weight: 700;
+}
+
+.stepper-step.completed .stepper-label {
+  color: #4B5563;
 }
 

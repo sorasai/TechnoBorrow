@@ -13,6 +13,7 @@ interface RequestDetailsModalProps {
 const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onClose, onOfferSuccess, initialTab }) => {
   const [offers, setOffers] = useState<any[]>([]);
   const [offering, setOffering] = useState(false);
+  const [confirmingOffer, setConfirmingOffer] = useState<any | null>(null);
   const currentUser = authApi.getCurrentUser();
 
   useEffect(() => {
@@ -69,12 +70,22 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
     }
   };
 
+  const handleAccept = async (offerId: number) => {
+    try {
+      await borrowingApi.acceptOffer(offerId);
+      if (onOfferSuccess) onOfferSuccess("Offer accepted successfully!");
+      setConfirmingOffer(null);
+      onClose(); // Close modal on success
+    } catch (err: any) {
+      alert(err.response?.data || 'Failed to accept offer.');
+    }
+  };
+
   const isOwnRequest = currentUser && request.requesterId === currentUser.id;
   const isPosted = request.status === 'POSTED';
   const hasOffered = currentUser && offers.some(o => o.lenderId === currentUser.id);
-  const hasAcceptedOffer = offers.some(o => o.status === 'ACCEPTED');
 
-  const showOfferButton = !isOwnRequest && isPosted && !hasOffered && !hasAcceptedOffer;
+  const showOfferButton = !isOwnRequest && isPosted;
 
   return (
     <div className="modal-overlay">
@@ -103,6 +114,44 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
               <p className="rd-description">{request.description}</p>
             </div>
 
+            {/* Stepper UI */}
+            {request.status !== 'POSTED' && (
+              <div className="stepper-container">
+                <div className="stepper-wrapper">
+                  {(() => {
+                    const steps = ['POSTED', 'MATCHED', 'BORROWED', 'RETURNED'];
+                    let currentStep = 0;
+                    if (request.status === 'POSTED') currentStep = 0;
+                    else if (request.status === 'MATCHED') currentStep = 1;
+                    else if (request.status === 'BORROWED') currentStep = 2;
+                    else if (request.status === 'RETURNED' || request.status === 'COMPLETED') currentStep = 3;
+
+                    const progressWidth = currentStep === 0 ? '0%' : 
+                                        currentStep === 1 ? '33%' : 
+                                        currentStep === 2 ? '66%' : '100%';
+
+                    return (
+                      <>
+                        <div className="stepper-progress-bar" style={{ width: `calc(${progressWidth} - 40px)` }}></div>
+                        {steps.map((step, index) => {
+                          const isActive = index === currentStep;
+                          const isCompleted = index < currentStep;
+                          return (
+                            <div key={step} className={`stepper-step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}>
+                              <div className="stepper-circle">
+                                {isCompleted ? '✓' : index + 1}
+                              </div>
+                              <span className="stepper-label">{step}</span>
+                            </div>
+                          );
+                        })}
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+
             {/* Offers Received Section for Requester */}
             {isOwnRequest && isPosted && (
               <div className={`rd-offers-section ${initialTab === 'offers' ? 'highlight-section' : ''}`}>
@@ -111,11 +160,24 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                   {offers.length > 0 ? (
                     <ul className="rd-offers-ul">
                       {offers.map((offer) => (
-                        <li key={offer.id} className="rd-offer-item">
-                          <span className="rd-lender-name">{offer.lenderName}</span>
-                          <span className="rd-offer-time" style={{ fontSize: '12px', color: '#6B7280' }}>
-                            {new Date(offer.createdAt).toLocaleString('en-US', formatOptions)}
-                          </span>
+                        <li key={offer.id} className="rd-offer-item" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                            <span className="rd-lender-name">{offer.lenderName}</span>
+                            <span className="rd-offer-time" style={{ fontSize: '12px', color: '#6B7280' }}>
+                              {new Date(offer.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          {isOwnRequest && isPosted && offer.status === 'PENDING' && (
+                            <button 
+                              onClick={() => setConfirmingOffer(offer)}
+                              className="rd-accept-btn"
+                            >
+                              Accept Offer
+                            </button>
+                          )}
+                          {offer.status === 'ACCEPTED' && (
+                            <span style={{ fontSize: '13px', color: '#7A1E2D', fontWeight: 'bold' }}>✓ Accepted Offer</span>
+                          )}
                         </li>
                       ))}
                     </ul>
@@ -165,16 +227,55 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
 
             <div className="rd-footer-integrated">
               {showOfferButton && (
-                <button type="button" className="rd-lend-btn" onClick={handleOffer} disabled={offering}>
-                  {offering ? 'Submitting...' : 'Offer to Lend'}
+                <button 
+                  type="button" 
+                  className={`rd-lend-btn ${hasOffered ? 'disabled-btn' : ''}`} 
+                  onClick={handleOffer} 
+                  disabled={offering || hasOffered}
+                  style={hasOffered ? { backgroundColor: '#D1D5DB', cursor: 'not-allowed', color: '#6B7280', border: '1px solid #D1D5DB' } : {}}
+                >
+                  {offering ? 'Submitting...' : hasOffered ? 'Offer Sent' : 'Offer to Lend'}
                 </button>
               )}
             </div>
           </div>
         </div>
-      </div>
+      {/* Confirmation Popup */}
+      {confirmingOffer && (
+        <div className="modal-overlay" style={{ zIndex: 100, backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
+          <div className="modal-content" style={{ maxWidth: '400px', padding: '24px', position: 'relative', textAlign: 'center' }}>
+            <button 
+              style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}
+              onClick={() => setConfirmingOffer(null)}
+            >
+              <X size={20} />
+            </button>
+            <h3 style={{ fontSize: '18px', color: '#7A1E2D', fontWeight: 700, marginTop: '8px', marginBottom: '16px' }}>
+              Accept Offer?
+            </h3>
+            <p style={{ fontSize: '14px', color: '#4B5563', lineHeight: '1.5', marginBottom: '24px' }}>
+              You will accept <strong>{confirmingOffer.lenderName}'s</strong> offer. This borrowing request will now be hidden from everyone but you can view it on your requests tab.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button 
+                onClick={() => setConfirmingOffer(null)}
+                style={{ padding: '10px 20px', border: '1px solid #7A1E2D', color: '#7A1E2D', backgroundColor: 'transparent', borderRadius: '6px', fontWeight: 600, fontSize: '14px', cursor: 'pointer', flex: 1 }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => handleAccept(confirmingOffer.id)}
+                style={{ padding: '10px 20px', border: 'none', color: '#FFFFFF', backgroundColor: '#7A1E2D', borderRadius: '6px', fontWeight: 600, fontSize: '14px', cursor: 'pointer', flex: 1 }}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default RequestDetailsModal;
