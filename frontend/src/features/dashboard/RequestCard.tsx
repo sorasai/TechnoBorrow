@@ -29,6 +29,8 @@ const RequestCard: React.FC<RequestCardProps> = ({
     switch (statusText.toLowerCase()) {
       case "posted":
         return "status-badge-posted";
+      case "matched":
+        return "status-badge-matched";
       case "pending":
         return "status-badge-pending";
       case "complete":

@@ -66,6 +66,46 @@ public class OfferService {
                 .collect(Collectors.toList());
     }
 
+    public List<OfferDTO> getOffersForUser(Long userId) {
+        return offerRepository.findByLenderIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public OfferDTO acceptOffer(Long offerId) {
+        Offer offerToAccept = offerRepository.findById(offerId)
+                .orElseThrow(() -> new RuntimeException("Offer not found"));
+
+        if (!"PENDING".equalsIgnoreCase(offerToAccept.getStatus())) {
+            throw new RuntimeException("Only PENDING offers can be accepted.");
+        }
+
+        BorrowingRequest request = offerToAccept.getBorrowingRequest();
+        if (!"POSTED".equalsIgnoreCase(request.getStatus())) {
+            throw new RuntimeException("Cannot accept offer. Request is no longer POSTED.");
+        }
+
+        // Accept the selected offer
+        offerToAccept.setStatus("ACCEPTED");
+        Offer savedOffer = offerRepository.save(offerToAccept);
+
+        // Reject all other offers for this request
+        List<Offer> allOffers = offerRepository.findByBorrowingRequest(request);
+        for (Offer o : allOffers) {
+            if (!o.getId().equals(offerId) && "PENDING".equalsIgnoreCase(o.getStatus())) {
+                o.setStatus("REJECTED");
+                offerRepository.save(o);
+            }
+        }
+
+        // Update the BorrowingRequest status
+        request.setStatus("MATCHED");
+        borrowingRequestRepository.save(request);
+
+        return mapToDTO(savedOffer);
+    }
+
     private OfferDTO mapToDTO(Offer offer) {
         OfferDTO dto = new OfferDTO();
         dto.setId(offer.getId());

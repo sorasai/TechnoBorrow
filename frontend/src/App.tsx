@@ -5,6 +5,9 @@ import RegisterPage from "./features/auth/RegisterPage";
 import DashboardPage from "./features/dashboard/DashboardPage";
 import ProfilePage from "./features/profile/ProfilePage";
 
+import MyRequestsPage from "./features/dashboard/MyRequestsPage";
+import MyTransactionsPage from "./features/dashboard/MyTransactionsPage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -15,6 +18,8 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/my-requests" element={<MyRequestsPage />} />
+        <Route path="/my-transactions" element={<MyTransactionsPage />} />
       </Routes>
     </BrowserRouter>
   );

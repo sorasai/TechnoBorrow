@@ -23,6 +23,30 @@ function DashboardPage() {
   const [requests, setRequests] = useState<any[]>([]);
   const requestsRef = React.useRef<any[]>([]);
   const [toasts, setToasts] = useState<any[]>([]);
+  const [hasOngoingTransactions, setHasOngoingTransactions] = useState(false);
+
+  const checkUserOffers = useCallback(async (userId: number) => {
+    try {
+      const offers = await borrowingApi.getOffersForUser(userId);
+      const acceptedOffers = offers.filter((o: any) => o.status === 'ACCEPTED');
+      
+      if (acceptedOffers.length === 0) {
+        setHasOngoingTransactions(false);
+        return;
+      }
+      
+      const allRequests = await borrowingApi.getAllRequests();
+      const acceptedOfferRequestIds = acceptedOffers.map((o: any) => o.requestId);
+      
+      const ongoingLending = allRequests.filter((req: any) => 
+        acceptedOfferRequestIds.includes(req.id) && req.status === 'MATCHED'
+      );
+      
+      setHasOngoingTransactions(ongoingLending.length > 0);
+    } catch (error) {
+      console.error("Failed to fetch user offers", error);
+    }
+  }, []);
 
   // Update ref whenever requests state changes
   useEffect(() => {
@@ -42,7 +66,8 @@ function DashboardPage() {
 
   const fetchRequests = useCallback(async (isInitial = false) => {
     try {
-      const data = await borrowingApi.getAllRequests();
+      const rawData = await borrowingApi.getAllRequests();
+      const data = rawData.filter((req: any) => req.status === 'POSTED');
       const currentUser = authApi.getCurrentUser();
       
       if (currentUser) {
@@ -80,6 +105,7 @@ function DashboardPage() {
         return;
       }
       setUser(currentUser);
+      checkUserOffers(currentUser.id);
     };
     loadUser();
     fetchRequests(true);
@@ -133,7 +159,7 @@ function DashboardPage() {
           <DashboardWelcome firstName={firstName} />
 
           {/* Stats Cards */}
-          <StatsCards />
+          <StatsCards hasOngoingTransactions={hasOngoingTransactions} />
 
           {/* Action Area */}
           <div className="dashboard-action-area">

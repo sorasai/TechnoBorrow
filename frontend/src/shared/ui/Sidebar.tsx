@@ -71,8 +71,8 @@ function Sidebar() {
         </div>
         
         <div 
-          className={`sidebar-item-hover ${currentPath === "/requests" ? "sidebar-item-active" : "sidebar-item-normal"} ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
-          onClick={() => {}}
+          className={`sidebar-item-hover ${currentPath === "/my-requests" ? "sidebar-item-active" : "sidebar-item-normal"} ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
+          onClick={() => navigate("/my-requests")}
           title="My Requests"
         >
           <FileText size={20} />
@@ -80,8 +80,8 @@ function Sidebar() {
         </div>
 
         <div 
-          className={`sidebar-item-hover ${currentPath === "/transactions" ? "sidebar-item-active" : "sidebar-item-normal"} ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
-          onClick={() => {}}
+          className={`sidebar-item-hover ${currentPath === "/my-transactions" ? "sidebar-item-active" : "sidebar-item-normal"} ${isCollapsed ? "sidebar-item-collapsed" : "sidebar-item-expanded"}`}
+          onClick={() => navigate("/my-transactions")}
           title="My Transactions"
         >
           <CreditCard size={20} />

@@ -32,4 +32,19 @@ public class OfferController {
     public ResponseEntity<List<OfferDTO>> getOffersForRequest(@PathVariable Long requestId) {
         return ResponseEntity.ok(offerService.getOffersForRequest(requestId));
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<OfferDTO>> getOffersForUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(offerService.getOffersForUser(userId));
+    }
+
+    @PostMapping("/{offerId}/accept")
+    public ResponseEntity<?> acceptOffer(@PathVariable Long offerId) {
+        try {
+            OfferDTO acceptedOffer = offerService.acceptOffer(offerId);
+            return ResponseEntity.ok(acceptedOffer);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
