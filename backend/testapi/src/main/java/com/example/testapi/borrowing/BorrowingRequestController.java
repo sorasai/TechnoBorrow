@@ -27,4 +27,16 @@ public class BorrowingRequestController {
         List<BorrowingRequestDTO> requests = borrowingRequestService.getAllRequests();
         return ResponseEntity.ok(requests);
     }
+
+    @PostMapping("/{id}/borrow")
+    public ResponseEntity<BorrowingRequestDTO> confirmBorrow(@PathVariable Long id) {
+        BorrowingRequestDTO updated = borrowingRequestService.confirmBorrow(id);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PostMapping("/{id}/return")
+    public ResponseEntity<BorrowingRequestDTO> confirmReturn(@PathVariable Long id, @RequestParam Long userId) {
+        BorrowingRequestDTO updated = borrowingRequestService.confirmReturn(id, userId);
+        return ResponseEntity.ok(updated);
+    }
 }

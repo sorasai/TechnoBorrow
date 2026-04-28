@@ -84,5 +84,31 @@ export const borrowingApi = {
             console.error('Error accepting offer:', error);
             throw error;
         }
+    },
+
+    /**
+     * Confirm borrow receipt
+     */
+    confirmBorrow: async (requestId: number) => {
+        try {
+            const response = await axios.post(`${API_BASE_URL}/${requestId}/borrow`);
+            return response.data;
+        } catch (error) {
+            console.error('Error confirming borrow receipt:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Confirm return
+     */
+    confirmReturn: async (requestId: number, userId: number) => {
+        try {
+            const response = await axios.post(`${API_BASE_URL}/${requestId}/return?userId=${userId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error confirming return:', error);
+            throw error;
+        }
     }
 };

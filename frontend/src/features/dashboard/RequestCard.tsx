@@ -11,6 +11,10 @@ interface RequestCardProps {
   isOwner?: boolean;
   onViewDetails?: () => void;
   onViewOffers?: () => void;
+  onConfirmBorrow?: () => void;
+  onConfirmReturn?: () => void;
+  confirmReturnLabel?: string;
+  confirmReturnMessage?: string;
 }
 
 const RequestCard: React.FC<RequestCardProps> = ({
@@ -24,6 +28,10 @@ const RequestCard: React.FC<RequestCardProps> = ({
   isOwner = false,
   onViewDetails,
   onViewOffers,
+  onConfirmBorrow,
+  onConfirmReturn,
+  confirmReturnLabel,
+  confirmReturnMessage,
 }) => {
   const getStatusClass = (statusText: string) => {
     switch (statusText.toLowerCase()) {
@@ -31,9 +39,14 @@ const RequestCard: React.FC<RequestCardProps> = ({
         return "status-badge-posted";
       case "matched":
         return "status-badge-matched";
+      case "borrowed":
+      case "borrower_returned":
+      case "lender_returned":
+        return "status-badge-borrowed";
       case "pending":
         return "status-badge-pending";
       case "complete":
+      case "returned":
         return "status-badge-complete";
       default:
         return "status-badge-default";
@@ -60,7 +73,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
           </div>
         </div>
         <span className={`request-card-status ${getStatusClass(status)}`}>
-          {status}
+          {(status === 'BORROWER_RETURNED' || status === 'LENDER_RETURNED') ? 'BORROWED' : status}
         </span>
       </div>
 
@@ -81,6 +94,52 @@ const RequestCard: React.FC<RequestCardProps> = ({
             View Offers ({offerCount})
           </button>
         )}
+        {isOwner && status.toUpperCase() === "MATCHED" && (
+          <button 
+            className="request-card-confirm-borrow-btn" 
+            onClick={onConfirmBorrow}
+            style={{
+              backgroundColor: 'transparent',
+              color: '#F97316',
+              border: '1.5px solid #F97316',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              marginRight: '8px'
+            }}
+          >
+            Confirm Item Received
+          </button>
+        )}
+        
+        {confirmReturnMessage && (
+          <span style={{ fontSize: '12px', color: '#7A1E2D', fontStyle: 'italic', marginRight: 'auto', alignSelf: 'center', paddingLeft: '8px' }}>
+            {confirmReturnMessage}
+          </span>
+        )}
+
+        {confirmReturnLabel && onConfirmReturn && (
+          <button 
+            className="request-card-confirm-return-btn" 
+            onClick={onConfirmReturn}
+            style={{
+              backgroundColor: 'transparent',
+              color: '#047857',
+              border: '1.5px solid #047857',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              marginRight: '8px'
+            }}
+          >
+            {confirmReturnLabel}
+          </button>
+        )}
+
         <button className="request-card-action-btn" onClick={onViewDetails}>
           View Details &gt;
         </button>

@@ -123,7 +123,7 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
                     let currentStep = 0;
                     if (request.status === 'POSTED') currentStep = 0;
                     else if (request.status === 'MATCHED') currentStep = 1;
-                    else if (request.status === 'BORROWED') currentStep = 2;
+                    else if (request.status === 'BORROWED' || request.status === 'BORROWER_RETURNED' || request.status === 'LENDER_RETURNED') currentStep = 2;
                     else if (request.status === 'RETURNED' || request.status === 'COMPLETED') currentStep = 3;
 
                     const progressWidth = currentStep === 0 ? '0%' : 
