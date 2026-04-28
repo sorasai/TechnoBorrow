@@ -100,4 +100,23 @@ public class BorrowingRequestDTO {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    private boolean borrowerConfirmedReturn;
+    private boolean lenderConfirmedReturn;
+
+    public boolean isBorrowerConfirmedReturn() {
+        return borrowerConfirmedReturn;
+    }
+
+    public void setBorrowerConfirmedReturn(boolean borrowerConfirmedReturn) {
+        this.borrowerConfirmedReturn = borrowerConfirmedReturn;
+    }
+
+    public boolean isLenderConfirmedReturn() {
+        return lenderConfirmedReturn;
+    }
+
+    public void setLenderConfirmedReturn(boolean lenderConfirmedReturn) {
+        this.lenderConfirmedReturn = lenderConfirmedReturn;
+    }
 }

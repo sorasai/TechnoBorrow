@@ -532,6 +532,12 @@ hr.modal-divider {
   border: 1px solid #FBD5D5;
 }
 
+.status-badge-borrowed {
+  background-color: #E0F2FE;
+  color: #0369A1;
+  border: 1px solid #BAE6FD;
+}
+
 .status-badge-pending {
   background-color: #DBEAFE;
   color: #1D4ED8;

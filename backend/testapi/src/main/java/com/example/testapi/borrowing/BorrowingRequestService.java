@@ -49,6 +49,17 @@ public class BorrowingRequestService {
                 .collect(Collectors.toList());
     }
 
+    public BorrowingRequestDTO confirmBorrow(Long requestId) {
+        BorrowingRequest request = borrowingRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Borrowing request not found"));
+        if (!"MATCHED".equalsIgnoreCase(request.getStatus()) && !"ONGOING".equalsIgnoreCase(request.getStatus())) {
+            throw new RuntimeException("Can only confirm receipt for MATCHED requests.");
+        }
+        request.setStatus("BORROWED");
+        BorrowingRequest saved = borrowingRequestRepository.save(request);
+        return mapToDTO(saved);
+    }
+
     private BorrowingRequestDTO mapToDTO(BorrowingRequest request) {
         BorrowingRequestDTO dto = new BorrowingRequestDTO();
         dto.setId(request.getId());
@@ -65,5 +76,54 @@ public class BorrowingRequestService {
         dto.setStatus(request.getStatus());
         dto.setOfferCount((int) offerRepository.countByBorrowingRequestId(request.getId()));
         return dto;
+    }
+
+    public BorrowingRequestDTO confirmReturn(Long requestId, Long userId) {
+        BorrowingRequest request = borrowingRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Borrowing request not found"));
+
+        String currentStatus = request.getStatus().toUpperCase();
+        if (!"BORROWED".equals(currentStatus) && 
+            !"BORROWER_RETURNED".equals(currentStatus) && 
+            !"LENDER_RETURNED".equals(currentStatus)) {
+            throw new RuntimeException("Can only return items that are currently BORROWED.");
+        }
+
+        boolean isBorrower = request.getRequester().getId().equals(userId);
+        
+        com.example.testapi.offer.Offer acceptedOffer = offerRepository.findByBorrowingRequest(request)
+            .stream()
+            .filter(o -> "ACCEPTED".equalsIgnoreCase(o.getStatus()))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Accepted offer not found"));
+            
+        boolean isLender = acceptedOffer.getLender().getId().equals(userId);
+
+        if (!isBorrower && !isLender) {
+            throw new RuntimeException("Unauthorized user attempting to confirm return.");
+        }
+
+        if (isBorrower) {
+            if ("BORROWER_RETURNED".equals(currentStatus)) {
+                throw new RuntimeException("You have already marked this item as returned.");
+            }
+            if ("LENDER_RETURNED".equals(currentStatus)) {
+                request.setStatus("RETURNED");
+            } else {
+                request.setStatus("BORROWER_RETURNED");
+            }
+        } else {
+            if ("LENDER_RETURNED".equals(currentStatus)) {
+                throw new RuntimeException("You have already confirmed the return of this item.");
+            }
+            if ("BORROWER_RETURNED".equals(currentStatus)) {
+                request.setStatus("RETURNED");
+            } else {
+                request.setStatus("LENDER_RETURNED");
+            }
+        }
+
+        BorrowingRequest saved = borrowingRequestRepository.save(request);
+        return mapToDTO(saved);
     }
 }
