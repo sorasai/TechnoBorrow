@@ -12,6 +12,7 @@ import SearchBar from "./SearchBar";
 import EmptyState from "./EmptyState";
 import RequestCard from "./RequestCard";
 import RequestDetailsModal from "./RequestDetailsModal";
+import { SkeletonGrid } from "./SkeletonCard";
 import "./dashboard.css";
 
 function DashboardPage() {
@@ -24,6 +25,7 @@ function DashboardPage() {
   const requestsRef = React.useRef<any[]>([]);
   const [toasts, setToasts] = useState<any[]>([]);
   const [hasOngoingTransactions, setHasOngoingTransactions] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const checkUserOffers = useCallback(async (userId: number) => {
     try {
@@ -98,24 +100,34 @@ function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    const loadUser = () => {
+    const loadData = async () => {
       const currentUser = authApi.getCurrentUser();
       if (!currentUser) {
         navigate("/login");
         return;
       }
       setUser(currentUser);
-      checkUserOffers(currentUser.id);
+      
+      try {
+        await Promise.all([
+          fetchRequests(true),
+          checkUserOffers(currentUser.id)
+        ]);
+      } catch (error) {
+        console.error("Error loading dashboard data", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    loadUser();
-    fetchRequests(true);
+
+    loadData();
 
     // Auto-refresh every 10 seconds (faster for testing) to catch new offers
     const interval = setInterval(() => {
       fetchRequests();
     }, 10000);
     return () => clearInterval(interval);
-  }, [navigate, fetchRequests]);
+  }, [navigate, fetchRequests, checkUserOffers]);
 
   const handleRequestCreated = () => {
     showToast("Request created successfully!");
@@ -175,7 +187,9 @@ function DashboardPage() {
           <div className="requests-section">
             <h2 className="requests-section-title">Explore Borrowing Requests</h2>
             <p className="requests-section-subtitle">Active campus requests available for lending</p>
-            {requests.length > 0 ? (
+            {isLoading ? (
+              <SkeletonGrid count={6} />
+            ) : requests.length > 0 ? (
               <div className="requests-grid">
                 {requests.map((req) => (
                   <RequestCard 

@@ -7,6 +7,7 @@ import Sidebar from "../../shared/ui/Sidebar";
 import Header from "../../shared/ui/Header";
 import RequestCard from "./RequestCard";
 import RequestDetailsModal from "./RequestDetailsModal";
+import { SkeletonGrid, SkeletonTableRow } from "./SkeletonCard";
 import "./dashboard.css";
 
 function MyTransactionsPage() {
@@ -19,6 +20,7 @@ function MyTransactionsPage() {
   const [confirmingReturnRequest, setConfirmingReturnRequest] = useState<any | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [toasts, setToasts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const showToast = (message: string, type: 'success' | 'info' | 'warning' = 'success') => {
     const id = Date.now();
@@ -68,13 +70,21 @@ function MyTransactionsPage() {
   }, []);
 
   useEffect(() => {
-    const currentUser = authApi.getCurrentUser();
-    if (!currentUser) {
-      navigate("/login");
-      return;
-    }
-    setUser(currentUser);
-    fetchTransactions();
+    const loadData = async () => {
+      const currentUser = authApi.getCurrentUser();
+      if (!currentUser) {
+        navigate("/login");
+        return;
+      }
+      setUser(currentUser);
+      try {
+        await fetchTransactions();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
     
     const interval = setInterval(fetchTransactions, 10000);
     return () => clearInterval(interval);
@@ -135,10 +145,12 @@ function MyTransactionsPage() {
 
 
           <div className="requests-section">
-            <h2 className="requests-section-title" style={{ color: '#F97316' }}>Ongoing Transactions</h2>
+            <h2 className="requests-section-title" style={{ color: '#7A1E2D' }}>Ongoing Transactions</h2>
             <p className="requests-section-subtitle">Active transactions where you are lending items.</p>
             
-            {ongoingTransactions.length > 0 ? (
+            {isLoading ? (
+              <SkeletonGrid count={3} />
+            ) : ongoingTransactions.length > 0 ? (
               <div className="requests-grid">
                 {ongoingTransactions.map((req) => (
                   <RequestCard 
@@ -173,7 +185,25 @@ function MyTransactionsPage() {
             <h2 className="requests-section-title">Transaction History</h2>
             <p className="requests-section-subtitle">A record of your all transactions.</p>
             
-            {transactionHistory.length > 0 ? (
+            {isLoading ? (
+              <div className="history-table-container" style={{ overflowX: 'auto', marginTop: '24px', backgroundColor: '#FFFFFF', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', padding: '16px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #E5E7EB' }}>
+                      <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Item</th>
+                      <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Role</th>
+                      <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</th>
+                      <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'center' }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <SkeletonTableRow cols={4} />
+                    <SkeletonTableRow cols={4} />
+                    <SkeletonTableRow cols={4} />
+                  </tbody>
+                </table>
+              </div>
+            ) : transactionHistory.length > 0 ? (
               <div className="history-table-container" style={{ overflowX: 'auto', marginTop: '24px', backgroundColor: '#FFFFFF', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', padding: '16px' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px', textAlign: 'left' }}>
                   <thead>

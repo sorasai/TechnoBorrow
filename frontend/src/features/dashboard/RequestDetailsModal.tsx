@@ -88,12 +88,101 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
   const showOfferButton = !isOwnRequest && isPosted;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content request-details-modal">
-        <div className="modal-header">
+    <div className="modal-overlay" style={{ backgroundColor: 'rgba(15, 23, 42, 0.5)' }}>
+      <style>{`
+        .premium-rd-modal {
+          background: #FFFFFF !important;
+          border-radius: 24px !important;
+          border: 1px solid rgba(229, 231, 235, 0.5) !important;
+          overflow: hidden !important;
+        }
+        .premium-rd-header {
+          background: #7A1E2D !important;
+          padding: 24px 32px !important;
+          border-bottom: none !important;
+        }
+        .premium-rd-header h2 {
+          color: #FFFFFF !important;
+          font-family: 'Outfit', sans-serif !important;
+          font-weight: 700 !important;
+          font-size: 22px !important;
+          letter-spacing: -0.5px !important;
+          margin: 0 !important;
+        }
+        .premium-rd-close {
+          color: rgba(255, 255, 255, 0.8) !important;
+          background: rgba(255, 255, 255, 0.1) !important;
+          border-radius: 50% !important;
+          padding: 6px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+        .premium-rd-close:hover {
+          color: #FFFFFF !important;
+          background: rgba(255, 255, 255, 0.2) !important;
+        }
+        .premium-rd-body {
+          padding: 32px !important;
+          gap: 32px !important;
+        }
+        .premium-rd-item-name {
+          font-family: 'Outfit', sans-serif !important;
+          font-weight: 800 !important;
+          font-size: 28px !important;
+          color: #1E293B !important;
+          margin-bottom: 12px !important;
+          letter-spacing: -0.5px !important;
+        }
+        .premium-rd-desc {
+          font-size: 15px !important;
+          color: #64748B !important;
+          line-height: 1.6 !important;
+        }
+        .premium-rd-detail-card {
+          background: #F8FAFC !important;
+          border-radius: 16px !important;
+          padding: 20px !important;
+          border: 1px solid #F1F5F9 !important;
+        }
+        .premium-rd-detail-card:hover {
+          background: #FFFFFF !important;
+          border-color: #E2E8F0 !important;
+        }
+        .premium-rd-badge {
+          padding: 6px 14px !important;
+          font-size: 12px !important;
+          font-weight: 700 !important;
+          border-radius: 9999px !important;
+          letter-spacing: 0.5px !important;
+        }
+        .premium-rd-user-row {
+          background: #F8FAFC !important;
+          border-radius: 16px !important;
+          padding: 16px !important;
+          border: 1px solid #F1F5F9 !important;
+          margin-bottom: 24px !important;
+        }
+        .premium-lend-btn {
+          background: #7A1E2D !important;
+          border: none !important;
+          border-radius: 12px !important;
+          padding: 14px 28px !important;
+          font-weight: 600 !important;
+          font-size: 15px !important;
+          color: #FFFFFF !important;
+          width: 100% !important;
+          cursor: pointer !important;
+        }
+        .premium-lend-btn:hover:not(:disabled) {
+          background: #5A0F1B !important;
+        }
+      `}</style>
+      <div className="modal-content request-details-modal premium-rd-modal">
+        <div className="modal-header premium-rd-header">
           <h2 className="modal-title">Request Details</h2>
-          <button className="modal-close-btn" onClick={onClose} type="button">
-            <X size={24} />
+          <button className="modal-close-btn premium-rd-close" onClick={onClose} type="button">
+            <X size={20} />
           </button>
         </div>
 
@@ -109,9 +198,9 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
               </div>
             )}
 
-            <div className="rd-title-section">
-              <h3 className="rd-item-name">{request.itemName}</h3>
-              <p className="rd-description">{request.description}</p>
+            <div className="rd-title-section" style={{ margin: '24px 0' }}>
+              <h3 className="rd-item-name premium-rd-item-name">{request.itemName}</h3>
+              <p className="rd-description premium-rd-desc">{request.description}</p>
             </div>
 
             {/* Stepper UI */}
@@ -191,34 +280,34 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
 
           <div className="rd-right-col">
             <div className="rd-header-section">
-              <div className="rd-user-row">
-                <img src={userImageSrc} alt={request.requesterName} className="rd-user-avatar" />
-                <div className="rd-user-text">
-                  <div className="rd-user-name">{request.requesterName}</div>
-                  <div className="rd-post-date">Posted {postedStr}</div>
+              <div className="rd-user-row premium-rd-user-row" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <img src={userImageSrc} alt={request.requesterName} className="rd-user-avatar" style={{ border: '2px solid #7A1E2D', padding: '2px' }} />
+                  <div className="rd-user-text">
+                    <div className="rd-user-name" style={{ fontWeight: 700, fontSize: '16px' }}>{request.requesterName}</div>
+                    <div className="rd-post-date">{postedStr}</div>
+                  </div>
                 </div>
-              </div>
-              <div className={`rd-status-badge rd-status-${request.status?.toLowerCase()}`}>
-                {request.status}
+                <div className={`rd-status-badge rd-status-${request.status?.toLowerCase()} premium-rd-badge`}>
+                  {request.status}
+                </div>
               </div>
             </div>
 
-            <hr className="modal-divider rd-divider-local" />
-
-            <div className="rd-details-grid-vertical">
-              <div className="rd-detail-box">
-                <div className="rd-box-label"><Target size={16}/> Purpose</div>
-                <div className="rd-box-value">{request.purpose}</div>
+            <div className="rd-details-grid-vertical" style={{ gap: '16px' }}>
+              <div className="rd-detail-box premium-rd-detail-card">
+                <div className="rd-box-label" style={{ color: '#7A1E2D', fontWeight: 700 }}><Target size={16}/> Purpose</div>
+                <div className="rd-box-value" style={{ fontSize: '15px', color: '#1E293B', lineHeight: 1.5 }}>{request.purpose}</div>
               </div>
               
-              <div className="rd-detail-box">
-                <div className="rd-box-label"><Clock size={16}/> Total Duration</div>
-                <div className="rd-box-value">{diffHrs} hours</div>
+              <div className="rd-detail-box premium-rd-detail-card">
+                <div className="rd-box-label" style={{ color: '#7A1E2D', fontWeight: 700 }}><Clock size={16}/> Total Duration</div>
+                <div className="rd-box-value" style={{ fontSize: '15px', color: '#1E293B' }}>{diffHrs} hours</div>
               </div>
 
-              <div className="rd-detail-box">
-                <div className="rd-box-label"><Calendar size={16}/> Borrowing Schedule</div>
-                <div className="rd-box-value schedule-value">
+              <div className="rd-detail-box premium-rd-detail-card">
+                <div className="rd-box-label" style={{ color: '#7A1E2D', fontWeight: 700 }}><Calendar size={16}/> Borrowing Schedule</div>
+                <div className="rd-box-value schedule-value" style={{ fontSize: '14px', color: '#1E293B' }}>
                   <div><strong>Start:</strong> {startStr}</div>
                   <div><strong>End:</strong> {endStr}</div>
                 </div>
@@ -229,10 +318,10 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({ request, onCl
               {showOfferButton && (
                 <button 
                   type="button" 
-                  className={`rd-lend-btn ${hasOffered ? 'disabled-btn' : ''}`} 
+                  className={`premium-lend-btn ${hasOffered ? 'disabled-btn' : ''}`} 
                   onClick={handleOffer} 
                   disabled={offering || hasOffered}
-                  style={hasOffered ? { backgroundColor: '#D1D5DB', cursor: 'not-allowed', color: '#6B7280', border: '1px solid #D1D5DB' } : {}}
+                  style={hasOffered ? { background: '#E2E8F0', cursor: 'not-allowed', color: '#94A3B8', border: '1px solid #E2E8F0', boxShadow: 'none' } : {}}
                 >
                   {offering ? 'Submitting...' : hasOffered ? 'Offer Sent' : 'Offer to Lend'}
                 </button>

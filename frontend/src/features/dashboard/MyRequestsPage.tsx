@@ -8,6 +8,7 @@ import Header from "../../shared/ui/Header";
 import RequestCard from "./RequestCard";
 import RequestDetailsModal from "./RequestDetailsModal";
 import EmptyState from "./EmptyState";
+import { SkeletonGrid, SkeletonTableRow } from "./SkeletonCard";
 import "./dashboard.css";
 
 function MyRequestsPage() {
@@ -22,6 +23,7 @@ function MyRequestsPage() {
   const [confirmingReceiptRequest, setConfirmingReceiptRequest] = useState<any | null>(null);
   const [confirmingReturnRequest, setConfirmingReturnRequest] = useState<any | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const showToast = (message: string, type: 'success' | 'info' | 'warning' = 'success') => {
     const id = Date.now();
@@ -68,13 +70,21 @@ function MyRequestsPage() {
   }, []);
 
   useEffect(() => {
-    const currentUser = authApi.getCurrentUser();
-    if (!currentUser) {
-      navigate("/login");
-      return;
-    }
-    setUser(currentUser);
-    fetchMyRequests();
+    const loadData = async () => {
+      const currentUser = authApi.getCurrentUser();
+      if (!currentUser) {
+        navigate("/login");
+        return;
+      }
+      setUser(currentUser);
+      try {
+        await fetchMyRequests();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
     
     const interval = setInterval(fetchMyRequests, 10000);
     return () => clearInterval(interval);
@@ -156,7 +166,9 @@ function MyRequestsPage() {
             <h2 className="requests-section-title" style={{ color: '#7A1E2D' }}>My Active Requests</h2>
             <p className="requests-section-subtitle">Requests that are currently ongoing.</p>
             
-            {activeRequests.length > 0 ? (
+            {isLoading ? (
+              <SkeletonGrid count={3} />
+            ) : activeRequests.length > 0 ? (
               <div className="requests-grid">
                 {activeRequests.map((req) => (
                   <RequestCard 
@@ -192,7 +204,26 @@ function MyRequestsPage() {
             <h2 className="requests-section-title">Request History</h2>
             <p className="requests-section-subtitle">Your completed or cancelled borrowing requests.</p>
             
-            {pastRequests.length > 0 ? (
+            {isLoading ? (
+              <div className="history-table-container" style={{ overflowX: 'auto', marginTop: '24px', backgroundColor: '#FFFFFF', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', padding: '16px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #E5E7EB' }}>
+                      <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Item Name</th>
+                      <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</th>
+                      <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Date Posted</th>
+                      <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Date Completed</th>
+                      <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'center' }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <SkeletonTableRow cols={5} />
+                    <SkeletonTableRow cols={5} />
+                    <SkeletonTableRow cols={5} />
+                  </tbody>
+                </table>
+              </div>
+            ) : pastRequests.length > 0 ? (
               <div className="history-table-container" style={{ overflowX: 'auto', marginTop: '24px', backgroundColor: '#FFFFFF', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', padding: '16px' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px', textAlign: 'left' }}>
                   <thead>
