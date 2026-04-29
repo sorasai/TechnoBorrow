@@ -43,7 +43,11 @@ const StatsCards: React.FC<StatsCardsProps> = ({ hasOngoingTransactions = false 
         </div>
       </div>
 
-      <div className="dashboard-stat-card">
+      <div 
+        className="dashboard-stat-card clickable-card" 
+        onClick={() => navigate('/my-transactions')}
+        style={{ cursor: 'pointer' }}
+      >
         <div className="dashboard-stat-icon-wrapper green">
           <Package size={24} color="#FFFFFF" />
         </div>
