@@ -36,4 +36,24 @@ interface ApiService {
 
     @POST("borrowing-requests")
     fun createRequest(@Body request: com.example.technoborrowapp.features.dashboard.data.model.CreateBorrowingRequestDTO): Call<com.example.technoborrowapp.features.dashboard.data.model.BorrowingRequest>
+
+    @POST("offers")
+    fun createOffer(@Body offer: com.example.technoborrowapp.features.dashboard.data.model.CreateOfferDTO): Call<com.example.technoborrowapp.features.dashboard.data.model.Offer>
+
+    @GET("offers/request/{requestId}")
+    fun getOffersForRequest(@Path("requestId") requestId: Long): Call<List<com.example.technoborrowapp.features.dashboard.data.model.Offer>>
+
+    @GET("offers/user/{userId}")
+    fun getOffersForUser(@Path("userId") userId: Long): Call<List<com.example.technoborrowapp.features.dashboard.data.model.Offer>>
+
+
+    @POST("offers/{offerId}/accept")
+    fun acceptOffer(@Path("offerId") offerId: Long): Call<ResponseBody>
+
+    @POST("borrowing-requests/{id}/borrow")
+    fun confirmBorrow(@Path("id") id: Long): Call<com.example.technoborrowapp.features.dashboard.data.model.BorrowingRequest>
+
+    @POST("borrowing-requests/{id}/return")
+    fun confirmReturn(@Path("id") id: Long, @Query("userId") userId: Long): Call<com.example.technoborrowapp.features.dashboard.data.model.BorrowingRequest>
 }
+

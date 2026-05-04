@@ -99,7 +99,142 @@
                                 android:textStyle="bold" />
                         </RelativeLayout>
 
+                        <!-- Stepper UI -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layoutStepper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="24dp">
+
+                            <!-- Progress Background Line -->
+                            <View
+                                android:id="@+id/lineProgress"
+                                android:layout_width="0dp"
+                                android:layout_height="4dp"
+                                android:background="#E5E7EB"
+                                app:layout_constraintStart_toStartOf="@+id/step1_circle"
+                                app:layout_constraintEnd_toEndOf="@+id/step4_circle"
+                                app:layout_constraintTop_toTopOf="@+id/step1_circle"
+                                app:layout_constraintBottom_toBottomOf="@+id/step1_circle" />
+
+                            <!-- Step 1: POSTED -->
+                            <TextView
+                                android:id="@+id/step1_circle"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:background="@drawable/stepper_circle_inactive"
+                                android:gravity="center"
+                                android:text="1"
+                                android:textColor="#9CA3AF"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                                app:layout_constraintEnd_toStartOf="@+id/step2_circle" />
+
+                            <TextView
+                                android:id="@+id/step1_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="POSTED"
+                                android:textColor="#9CA3AF"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                app:layout_constraintTop_toBottomOf="@+id/step1_circle"
+                                app:layout_constraintStart_toStartOf="@+id/step1_circle"
+                                app:layout_constraintEnd_toEndOf="@+id/step1_circle" />
+
+                            <!-- Step 2: MATCHED -->
+                            <TextView
+                                android:id="@+id/step2_circle"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:background="@drawable/stepper_circle_inactive"
+                                android:gravity="center"
+                                android:text="2"
+                                android:textColor="#9CA3AF"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/step1_circle"
+                                app:layout_constraintEnd_toStartOf="@+id/step3_circle" />
+
+                            <TextView
+                                android:id="@+id/step2_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="MATCHED"
+                                android:textColor="#9CA3AF"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                app:layout_constraintTop_toBottomOf="@+id/step2_circle"
+                                app:layout_constraintStart_toStartOf="@+id/step2_circle"
+                                app:layout_constraintEnd_toEndOf="@+id/step2_circle" />
+
+                            <!-- Step 3: BORROWED -->
+                            <TextView
+                                android:id="@+id/step3_circle"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:background="@drawable/stepper_circle_inactive"
+                                android:gravity="center"
+                                android:text="3"
+                                android:textColor="#9CA3AF"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/step2_circle"
+                                app:layout_constraintEnd_toStartOf="@+id/step4_circle" />
+
+                            <TextView
+                                android:id="@+id/step3_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="BORROWED"
+                                android:textColor="#9CA3AF"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                app:layout_constraintTop_toBottomOf="@+id/step3_circle"
+                                app:layout_constraintStart_toStartOf="@+id/step3_circle"
+                                app:layout_constraintEnd_toEndOf="@+id/step3_circle" />
+
+                            <!-- Step 4: RETURNED -->
+                            <TextView
+                                android:id="@+id/step4_circle"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:background="@drawable/stepper_circle_inactive"
+                                android:gravity="center"
+                                android:text="4"
+                                android:textColor="#9CA3AF"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/step3_circle"
+                                app:layout_constraintEnd_toEndOf="parent" />
+
+                            <TextView
+                                android:id="@+id/step4_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="RETURNED"
+                                android:textColor="#9CA3AF"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                app:layout_constraintTop_toBottomOf="@+id/step4_circle"
+                                app:layout_constraintStart_toStartOf="@+id/step4_circle"
+                                app:layout_constraintEnd_toEndOf="@+id/step4_circle" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
                         <TextView
+
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Description"
@@ -269,6 +404,92 @@
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Offers Received Section -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvOffersSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Offers Received"
+                        android:textColor="#111827"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvOffers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/tvNoOffersYet"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="No offers yet"
+                        android:textColor="#6B7280"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:padding="24dp"
+                        android:visibility="gone" />
+
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOfferToLend"
+                style="@style/AuthButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Offer to Lend"
+                android:visibility="gone"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/dark_red" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConfirmBorrow"
+                style="@style/AuthButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirm Borrow Receipt"
+                android:visibility="gone"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/dark_red" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConfirmReturn"
+                style="@style/AuthButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirm Return"
+                android:visibility="gone"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/dark_red" />
+
+            <TextView
+                android:id="@+id/tvReturnStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#6B7280"
+                android:textSize="14sp"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"
+                android:text="Waiting for other user to confirm return..." />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnContactLender"
                 style="@style/AuthButtonStyle"
@@ -277,6 +498,7 @@
                 android:text="Contact Requester"
                 android:textColor="@color/white"
                 app:backgroundTint="@color/dark_red" />
+
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
