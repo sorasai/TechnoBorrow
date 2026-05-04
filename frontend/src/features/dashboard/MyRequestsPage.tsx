@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle, Info, Bell, ArrowLeft, X } from "lucide-react";
+import { CheckCircle, Info, Bell, X } from "lucide-react";
 import { authApi } from "../auth/api";
 import { borrowingApi } from "./api";
 import Sidebar from "../../shared/ui/Sidebar";
 import Header from "../../shared/ui/Header";
 import RequestCard from "./RequestCard";
 import RequestDetailsModal from "./RequestDetailsModal";
-import EmptyState from "./EmptyState";
+
 import { SkeletonGrid, SkeletonTableRow } from "./SkeletonCard";
 import "./dashboard.css";
 
@@ -19,7 +19,7 @@ function MyRequestsPage() {
   const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
   const [initialTab, setInitialTab] = useState<string | undefined>(undefined);
   const [toasts, setToasts] = useState<any[]>([]);
-  const [shownMatchedAlerts, setShownMatchedAlerts] = useState<number[]>([]);
+  const [, setShownMatchedAlerts] = useState<number[]>([]);
   const [confirmingReceiptRequest, setConfirmingReceiptRequest] = useState<any | null>(null);
   const [confirmingReturnRequest, setConfirmingReturnRequest] = useState<any | null>(null);
   const [confirming, setConfirming] = useState(false);

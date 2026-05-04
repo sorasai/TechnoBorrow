@@ -2,7 +2,7 @@ import "./landing.css";
 import NavSection from "./NavSection";
 import HeroSection from "./HeroSection";
 import WhatIsSection from "./WhatIsSection";
-import CorePrinciplesSection from "./CorePrinciplesSection";
+
 import HowItWorksSection from "./HowItWorksSection";
 import PlatformFeaturesSection from "./PlatformFeaturesSection";
 import AboutSection from "./AboutSection";
