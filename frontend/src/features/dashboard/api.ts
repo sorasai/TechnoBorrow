@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api/borrowing-requests';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = `${API_URL}/borrowing-requests`;
 
 export const borrowingApi = {
 
@@ -35,7 +36,7 @@ export const borrowingApi = {
      */
     createOffer: async (requestId: number, lenderId: number, message: string) => {
         try {
-            const response = await axios.post(`http://localhost:8080/api/offers`, {
+            const response = await axios.post(`${API_URL}/offers`, {
                 requestId,
                 lenderId,
                 message
@@ -52,7 +53,7 @@ export const borrowingApi = {
      */
     getOffersForRequest: async (requestId: number) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/offers/request/${requestId}`);
+            const response = await axios.get(`${API_URL}/offers/request/${requestId}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching offers for request:', error);
@@ -65,7 +66,7 @@ export const borrowingApi = {
      */
     getOffersForUser: async (userId: number) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/offers/user/${userId}`);
+            const response = await axios.get(`${API_URL}/offers/user/${userId}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching user offers:', error);
@@ -78,7 +79,7 @@ export const borrowingApi = {
      */
     acceptOffer: async (offerId: number) => {
         try {
-            const response = await axios.post(`http://localhost:8080/api/offers/${offerId}/accept`);
+            const response = await axios.post(`${API_URL}/offers/${offerId}/accept`);
             return response.data;
         } catch (error) {
             console.error('Error accepting offer:', error);
