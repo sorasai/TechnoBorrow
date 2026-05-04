@@ -15,5 +15,8 @@ data class BorrowingRequest(
     val requesterName: String,
     val requesterImage: String?,
     val createdAt: String,
-    val status: String
+    val status: String,
+    val requesterId: Long? = null,
+    val offerCount: Int? = 0
 ) : Parcelable
+

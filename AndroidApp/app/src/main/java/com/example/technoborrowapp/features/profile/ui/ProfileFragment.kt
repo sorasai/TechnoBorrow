@@ -7,12 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.technoborrowapp.R
 import com.example.technoborrowapp.core.network.RetrofitClient
 import com.example.technoborrowapp.features.auth.data.model.User
 import com.example.technoborrowapp.features.auth.ui.LoginActivity
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -27,6 +31,44 @@ class ProfileFragment : Fragment() {
     private lateinit var ivAvatar: ImageView
     private var userId: Long = -1L
 
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            uploadSelectedPhoto(it)
+        }
+    }
+
+    private fun uploadSelectedPhoto(uri: android.net.Uri) {
+        try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val bytes = inputStream?.readBytes()
+            inputStream?.close()
+
+            if (bytes != null) {
+                val requestFile = RequestBody.create(
+                    MediaType.parse(requireContext().contentResolver.getType(uri) ?: "image/jpeg"),
+                    bytes
+                )
+                val body = MultipartBody.Part.createFormData("file", "avatar.jpg", requestFile)
+
+                RetrofitClient.instance.uploadPhoto(userId, body).enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (isAdded && response.isSuccessful) {
+                            Toast.makeText(requireContext(), "Photo uploaded successfully", Toast.LENGTH_SHORT).show()
+                            loadData()
+                        } else {
+                            Toast.makeText(requireContext(), "Failed to upload photo", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        if (isAdded) Toast.makeText(requireContext(), "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
+            }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Failed to read image", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.activity_profile, container, false)
     }
@@ -39,7 +81,6 @@ class ProfileFragment : Fragment() {
 
     private fun setupUI(view: View) {
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-        // Hide navigation icon in fragment as it's a main tab
         toolbar.navigationIcon = null
         
         etName = view.findViewById(R.id.etProfileName)
@@ -58,12 +99,13 @@ class ProfileFragment : Fragment() {
         btnLogout.setOnClickListener { logout() }
         
         btnUpload.setOnClickListener {
-            Toast.makeText(requireContext(), "Photo upload coming soon!", Toast.LENGTH_SHORT).show()
+            pickImageLauncher.launch("image/*")
         }
 
         val sharedPref = requireActivity().getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
         userId = sharedPref.getLong("user_id", -1L)
     }
+
 
     private fun loadData() {
         if (userId == -1L) return

@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.technoborrowapp.features.dashboard.ui.DashboardFragment
+import com.example.technoborrowapp.features.dashboard.ui.MyRequestsFragment
+import com.example.technoborrowapp.features.dashboard.ui.MyTransactionsFragment
+
 import com.example.technoborrowapp.features.dashboard.ui.PlaceholderFragment
 import com.example.technoborrowapp.features.profile.ui.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -23,13 +26,14 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_requests -> {
-                    loadFragment(PlaceholderFragment("My Requests"))
+                    loadFragment(MyRequestsFragment())
                     true
                 }
                 R.id.nav_transactions -> {
-                    loadFragment(PlaceholderFragment("My Transactions"))
+                    loadFragment(MyTransactionsFragment())
                     true
                 }
+
                 R.id.nav_profile -> {
                     loadFragment(ProfileFragment())
                     true
