@@ -17,6 +17,7 @@ interface RegisterFormProps {
     onConfirmPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onAgreedChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onSubmit: () => void;
+    isLoading?: boolean;
 }
 
 const RegisterForm = ({
@@ -32,6 +33,7 @@ const RegisterForm = ({
     onConfirmPasswordChange,
     onAgreedChange,
     onSubmit,
+    isLoading,
 }: RegisterFormProps) => (
     <AuthCard variant="register">
         {/* Heading */}
@@ -93,7 +95,7 @@ const RegisterForm = ({
         )}
 
         {/* Submit */}
-        <AuthButton label="Register" onClick={onSubmit} />
+        <AuthButton label={isLoading ? "Registering.." : "Register"} onClick={onSubmit} disabled={isLoading} />
 
         {/* Bottom link */}
         <p className="auth-bottom-link">

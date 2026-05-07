@@ -8,6 +8,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -18,11 +19,19 @@ function LoginPage() {
       return;
     }
 
+    const emailRegex = /^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+@cit\.edu$/;
+    if (!emailRegex.test(email)) {
+        setError("Invalid CIT-U Email. Use firstname.lastname@cit.edu");
+        return;
+    }
+
     try {
+      setIsLoading(true);
       const response = await authApi.login({ email, password });
       
       if (typeof response === 'string' && response.startsWith('Login Failed')) {
         setError(response);
+        setIsLoading(false);
         return;
       }
 
@@ -34,6 +43,8 @@ function LoginPage() {
       }
     } catch (err: any) {
       setError("An error occurred connecting to the server.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -42,6 +53,7 @@ function LoginPage() {
       email={email}
       password={password}
       error={error}
+      isLoading={isLoading}
       onEmailChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
       onPasswordChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
       onSubmit={handleLogin}
