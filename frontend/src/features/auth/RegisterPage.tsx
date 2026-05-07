@@ -11,6 +11,7 @@ function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async () => {
@@ -21,27 +22,36 @@ function RegisterPage() {
       return;
     }
 
+    const emailRegex = /^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+@cit\.edu$/;
+    if (!emailRegex.test(email)) {
+        setError("Invalid CIT-U Email. Use firstname.lastname@cit.edu");
+        return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
     try {
+      setIsLoading(true);
       const response = await authApi.register({ email, passwordHash: password, fullName });
       
       if (typeof response === 'string' && response.startsWith('Error:')) {
         setError(response.replace('Error: ', ''));
+        setIsLoading(false);
         return;
       }
       
       if (response && response.id) {
-        authApi.setCurrentUser(response);
-        navigate("/dashboard");
+        navigate("/login");
       } else {
         setError("Registration failed. Please try again.");
       }
     } catch (err: any) {
       setError("An error occurred connecting to the server.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -53,6 +63,7 @@ function RegisterPage() {
       confirmPassword={confirmPassword}
       agreed={agreed}
       error={error}
+      isLoading={isLoading}
       onFullNameChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
       onEmailChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
       onPasswordChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}

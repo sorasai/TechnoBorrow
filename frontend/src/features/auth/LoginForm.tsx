@@ -11,6 +11,7 @@ interface LoginFormProps {
     onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onSubmit: () => void;
+    isLoading?: boolean;
 }
 
 const LoginForm = ({
@@ -20,6 +21,7 @@ const LoginForm = ({
     onEmailChange,
     onPasswordChange,
     onSubmit,
+    isLoading,
 }: LoginFormProps) => {
     return (
         <AuthCard>
@@ -55,7 +57,7 @@ const LoginForm = ({
             )}
 
             {/* Submit */}
-            <AuthButton label="Sign In" onClick={onSubmit} />
+            <AuthButton label={isLoading ? "Logging in.." : "Sign In"} onClick={onSubmit} disabled={isLoading} />
 
             {/* Bottom link */}
             <p className="auth-bottom-link">
