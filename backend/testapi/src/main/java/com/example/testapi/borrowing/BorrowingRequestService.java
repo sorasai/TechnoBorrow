@@ -43,8 +43,19 @@ public class BorrowingRequestService {
     }
 
     public List<BorrowingRequestDTO> getAllRequests() {
-        return borrowingRequestRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
+        List<BorrowingRequest> requests = borrowingRequestRepository.findAllByOrderByCreatedAtDesc();
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        
+        for (BorrowingRequest request : requests) {
+            if ("POSTED".equals(request.getStatus())) {
+                if (now.isAfter(request.getStartDate())) {
+                    request.setStatus("EXPIRED");
+                    borrowingRequestRepository.save(request);
+                }
+            }
+        }
+
+        return requests.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }

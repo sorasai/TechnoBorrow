@@ -48,6 +48,9 @@ const RequestCard: React.FC<RequestCardProps> = ({
       case "complete":
       case "returned":
         return "status-badge-complete";
+      case "expired":
+      case "cancelled":
+        return "status-badge-expired";
       default:
         return "status-badge-default";
     }

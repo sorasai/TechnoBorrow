@@ -45,7 +45,7 @@ function MyRequestsPage() {
       const myRequests = allRequests.filter((req: any) => req.requesterId === currentUser.id);
       
       const active = myRequests.filter((req: any) => req.status === 'POSTED' || req.status === 'MATCHED' || req.status === 'BORROWED' || req.status === 'BORROWER_RETURNED' || req.status === 'LENDER_RETURNED');
-      const past = myRequests.filter((req: any) => req.status === 'RETURNED' || req.status === 'CANCELLED');
+      const past = myRequests.filter((req: any) => req.status === 'RETURNED' || req.status === 'CANCELLED' || req.status === 'EXPIRED');
 
       // Trigger matched alerts
       active.forEach((req: any) => {
