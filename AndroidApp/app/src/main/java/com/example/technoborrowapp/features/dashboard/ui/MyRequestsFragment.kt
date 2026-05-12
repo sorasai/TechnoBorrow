@@ -75,8 +75,8 @@ class MyRequestsFragment : Fragment() {
                     val all = response.body() ?: emptyList()
                     val myRequests = all.filter { it.requesterId == currentUserId }
                     
-                    val active = myRequests.filter { it.status.uppercase() != "RETURNED" && it.status.uppercase() != "CANCELLED" }
-                    val past = myRequests.filter { it.status.uppercase() == "RETURNED" || it.status.uppercase() == "CANCELLED" }
+                    val active = myRequests.filter { it.status.uppercase() != "RETURNED" && it.status.uppercase() != "CANCELLED" && it.status.uppercase() != "EXPIRED" }
+                    val past = myRequests.filter { it.status.uppercase() == "RETURNED" || it.status.uppercase() == "CANCELLED" || it.status.uppercase() == "EXPIRED" }
                     
                     activeAdapter.updateData(active)
                     pastAdapter.updateData(past)

@@ -103,8 +103,8 @@ class DashboardFragment : Fragment() {
                 if (isAdded && response.isSuccessful) {
                     val all = response.body() ?: emptyList()
                     
-                    // Active Requests Stat: User's requests where status is not Returned or Cancelled
-                    val activeCount = all.filter { it.requesterId == currentUserId && it.status.uppercase() != "RETURNED" && it.status.uppercase() != "CANCELLED" }.size
+                    // Active Requests Stat: User's requests where status is not Returned, Cancelled, or Expired
+                    val activeCount = all.filter { it.requesterId == currentUserId && it.status.uppercase() != "RETURNED" && it.status.uppercase() != "CANCELLED" && it.status.uppercase() != "EXPIRED" }.size
                     tvStatActive.text = activeCount.toString()
 
                     // The explorer list shows all requests that are posted/pending, sorted so user's own requests are at the top

@@ -97,7 +97,7 @@ class MyTransactionsFragment : Fragment() {
                         val status = it.status.uppercase()
                         status == "MATCHED" || status == "BORROWED" || status == "BORROWER_RETURNED" || status == "LENDER_RETURNED" || status == "ONGOING"
                     }
-                    val past = myTransactions.filter { it.status.uppercase() == "RETURNED" || it.status.uppercase() == "CANCELLED" }
+                    val past = myTransactions.filter { it.status.uppercase() == "RETURNED" || it.status.uppercase() == "CANCELLED" || it.status.uppercase() == "EXPIRED" }
 
                     
                     ongoingAdapter.updateData(ongoing)
