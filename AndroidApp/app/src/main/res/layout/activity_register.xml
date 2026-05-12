@@ -30,10 +30,16 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="12dp"
+                    android:src="@drawable/technoborrow_logo" />
+
+                <com.example.technoborrowapp.core.ui.GradientTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TECHNOBORROW"
+                    android:text="TechnoBorrow"
                     android:textColor="@color/primary"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -53,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="32dp"
-                android:text="Join our community"
+                android:text="Join the TechnoBorrow community"
                 android:textColor="@color/text_hint"
                 android:textSize="14sp" />
 
@@ -70,7 +76,7 @@
             <EditText
                 android:id="@+id/etFullName"
                 style="@style/AuthInputStyle"
-                android:hint="John Doe"
+                android:hint="Enter your full name"
                 android:inputType="textPersonName"
                 android:layout_marginBottom="16dp" />
 
@@ -78,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="7dp"
-                android:text="Email"
+                android:text="CIT-U Email"
                 android:textColor="@color/white"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -86,7 +92,7 @@
             <EditText
                 android:id="@+id/etEmail"
                 style="@style/AuthInputStyle"
-                android:hint="name@company.com"
+                android:hint="e.g. firstname.lastname@cit.edu"
                 android:inputType="textEmailAddress"
                 android:layout_marginBottom="16dp" />
 
@@ -102,7 +108,7 @@
             <EditText
                 android:id="@+id/etPassword"
                 style="@style/AuthInputStyle"
-                android:hint="••••••••"
+                android:hint="Create a password"
                 android:inputType="textPassword"
                 android:layout_marginBottom="16dp" />
 
@@ -118,14 +124,24 @@
             <EditText
                 android:id="@+id/etConfirmPassword"
                 style="@style/AuthInputStyle"
-                android:hint="••••••••"
+                android:hint="Re-enter your password"
                 android:inputType="textPassword"
                 android:layout_marginBottom="24dp" />
+
+            <CheckBox
+                android:id="@+id/cbTerms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:buttonTint="@color/primary"
+                android:text="By creating an account, you agree to the Terms and Conditions"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRegister"
                 style="@style/AuthButtonStyle"
-                android:text="Create Account" />
+                android:text="Register" />
 
             <TextView
                 android:id="@+id/tvLogin"

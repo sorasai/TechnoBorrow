@@ -28,10 +28,16 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <TextView
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="12dp"
+                android:src="@drawable/technoborrow_logo" />
+
+            <com.example.technoborrowapp.core.ui.GradientTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TECHNOBORROW"
+                android:text="TechnoBorrow"
                 android:textColor="@color/primary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -41,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Welcome Back"
+            android:text="Sign In"
             android:textColor="@color/white"
             android:textSize="26sp"
             android:textStyle="bold" />
@@ -51,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="32dp"
-            android:text="Login to continue"
+            android:text="Access your TechnoBorrow account"
             android:textColor="@color/text_hint"
             android:textSize="14sp" />
 
@@ -60,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="7dp"
-            android:text="Email"
+            android:text="CIT-U Email"
             android:textColor="@color/white"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -68,7 +74,7 @@
         <EditText
             android:id="@+id/etEmail"
             style="@style/AuthInputStyle"
-            android:hint="name@company.com"
+            android:hint="e.g. firstname.lastname@cit.edu"
             android:inputType="textEmailAddress"
             android:layout_marginBottom="20dp" />
 
@@ -84,7 +90,7 @@
         <EditText
             android:id="@+id/etPassword"
             style="@style/AuthInputStyle"
-            android:hint="••••••••"
+            android:hint="Enter your password"
             android:inputType="textPassword"
             android:layout_marginBottom="16dp" />
 
@@ -100,7 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="24dp"
-            android:text="Don't have an account? Register"
+            android:text="Don't have an account? Sign up"
             android:textColor="@color/primary"
             android:textSize="14sp"
             android:textStyle="bold" />
