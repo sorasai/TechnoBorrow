@@ -7,24 +7,25 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.technoborrowapp.MainActivity
 import com.example.technoborrowapp.R
-import com.example.technoborrowapp.core.network.RetrofitClient
-import com.example.technoborrowapp.features.auth.data.model.LoginRequest
+import com.example.technoborrowapp.features.auth.contract.LoginContract
 import com.example.technoborrowapp.features.auth.data.model.User
-import com.example.technoborrowapp.features.dashboard.ui.DashboardActivity
-import com.google.gson.Gson
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.technoborrowapp.features.auth.presenter.LoginPresenter
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), LoginContract.View {
+
+    private lateinit var presenter: LoginContract.Presenter
+    private lateinit var etEmail: EditText
+    private lateinit var etPassword: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val etEmail = findViewById<EditText>(R.id.etEmail)
-        val etPassword = findViewById<EditText>(R.id.etPassword)
+        // Initialize Presenter
+        presenter = LoginPresenter(this)
+
+        etEmail = findViewById(R.id.etEmail)
+        etPassword = findViewById(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val tvRegister = findViewById<TextView>(R.id.tvRegister)
 
@@ -35,49 +36,39 @@ class LoginActivity : AppCompatActivity() {
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
-
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val request = LoginRequest(email, password)
-
-            RetrofitClient.instance.login(request)
-                .enqueue(object : Callback<ResponseBody> {
-                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                        val responseBody = response.body()?.string() ?: response.errorBody()?.string()
-                        
-                        if (response.isSuccessful && responseBody != null) {
-                            try {
-                                if (responseBody.trim().startsWith("{")) {
-                                    // It's likely a JSON object (User)
-                                    val user = Gson().fromJson(responseBody, User::class.java)
-                                    if (user != null && user.id != null) {
-                                        saveSessionAndRedirect(user)
-                                    } else {
-                                        Toast.makeText(this@LoginActivity, "Server error: Invalid user data", Toast.LENGTH_SHORT).show()
-                                    }
-                                } else {
-                                    // It's likely a plain error message string
-                                    Toast.makeText(this@LoginActivity, responseBody, Toast.LENGTH_LONG).show()
-                                }
-                            } catch (e: Exception) {
-                                Toast.makeText(this@LoginActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-                        } else {
-                            Toast.makeText(this@LoginActivity, "Login failed: ${responseBody ?: "Unknown error"}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                        Toast.makeText(this@LoginActivity, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
-                    }
-                })
+            presenter.login(email, password)
         }
     }
 
-    private fun saveSessionAndRedirect(user: User) {
+    override fun setPresenter(presenter: LoginContract.Presenter) {
+        this.presenter = presenter
+    }
+
+    override fun showLoading() {
+        // You could add a ProgressBar to the layout and show it here
+        Toast.makeText(this, "Logging in...", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun hideLoading() {
+        // Hide ProgressBar
+    }
+
+    override fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun navigateToDashboard() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
+    override fun showLoginSuccess(user: User) {
+        Toast.makeText(this, "Welcome, ${user.fullName}", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun saveSession(user: User) {
         val sharedPref = getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putLong("user_id", user.id ?: -1L)
@@ -85,11 +76,10 @@ class LoginActivity : AppCompatActivity() {
             putString("full_name", user.fullName)
             apply()
         }
+    }
 
-        Toast.makeText(this, "Welcome, ${user.fullName}", Toast.LENGTH_SHORT).show()
-        val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
     }
 }

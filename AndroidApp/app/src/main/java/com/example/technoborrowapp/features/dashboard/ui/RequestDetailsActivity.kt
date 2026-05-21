@@ -13,26 +13,32 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.technoborrowapp.R
-import com.example.technoborrowapp.core.network.RetrofitClient
+import com.example.technoborrowapp.features.dashboard.contract.RequestDetailsContract
 import com.example.technoborrowapp.features.dashboard.data.model.BorrowingRequest
-import com.example.technoborrowapp.features.dashboard.data.model.CreateOfferDTO
 import com.example.technoborrowapp.features.dashboard.data.model.Offer
+import com.example.technoborrowapp.features.dashboard.presenter.RequestDetailsPresenter
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class RequestDetailsActivity : AppCompatActivity() {
+class RequestDetailsActivity : AppCompatActivity(), RequestDetailsContract.View {
 
+    private lateinit var presenter: RequestDetailsContract.Presenter
     private lateinit var offerAdapter: OfferAdapter
-    private var currentUserId: Long = -1L
-    private lateinit var currentRequest: BorrowingRequest
+    
+    private lateinit var tvNoOffersYet: TextView
+    private lateinit var rvOffers: RecyclerView
+    private lateinit var cvOffersSection: CardView
+    private lateinit var btnOfferToLend: MaterialButton
+    private lateinit var btnConfirmBorrow: MaterialButton
+    private lateinit var btnConfirmReturn: MaterialButton
+    private lateinit var tvReturnStatus: TextView
+    private lateinit var btnContact: MaterialButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_request_details)
+
+        presenter = RequestDetailsPresenter(this)
 
         val req = intent.getParcelableExtra<BorrowingRequest>("request")
         if (req == null) {
@@ -40,18 +46,53 @@ class RequestDetailsActivity : AppCompatActivity() {
             finish()
             return
         }
-        currentRequest = req
-
-        val sharedPref = getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
-        currentUserId = sharedPref.getLong("user_id", -1L)
 
         setupUI()
-        updateFlow()
+        presenter.initialize(req)
     }
-
 
     private fun setupUI() {
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        toolbar.setNavigationOnClickListener { finish() }
+
+        rvOffers = findViewById(R.id.rvOffers)
+        tvNoOffersYet = findViewById(R.id.tvNoOffersYet)
+        cvOffersSection = findViewById(R.id.cvOffersSection)
+        btnOfferToLend = findViewById(R.id.btnOfferToLend)
+        btnConfirmBorrow = findViewById(R.id.btnConfirmBorrow)
+        btnConfirmReturn = findViewById(R.id.btnConfirmReturn)
+        tvReturnStatus = findViewById(R.id.tvReturnStatus)
+        btnContact = findViewById(R.id.btnContactLender)
+
+        rvOffers.layoutManager = LinearLayoutManager(this)
+        offerAdapter = OfferAdapter(emptyList()) { offer ->
+            presenter.acceptOffer(offer.id)
+        }
+        rvOffers.adapter = offerAdapter
+
+        btnOfferToLend.setOnClickListener {
+            presenter.createOffer()
+        }
+
+        btnConfirmBorrow.setOnClickListener {
+            presenter.confirmBorrow()
+        }
+
+        btnConfirmReturn.setOnClickListener {
+            presenter.confirmReturn()
+        }
+    }
+
+    override fun setPresenter(presenter: RequestDetailsContract.Presenter) {
+        this.presenter = presenter
+    }
+
+    override fun getUserId(): Long {
+        val sharedPref = getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
+        return sharedPref.getLong("user_id", -1L)
+    }
+
+    override fun updateFlow(request: BorrowingRequest) {
         val ivItem = findViewById<ImageView>(R.id.ivItemImageDet)
         val tvName = findViewById<TextView>(R.id.tvItemNameDet)
         val tvStatus = findViewById<TextView>(R.id.tvStatusDet)
@@ -62,17 +103,15 @@ class RequestDetailsActivity : AppCompatActivity() {
         val ivRequester = findViewById<ShapeableImageView>(R.id.ivRequesterAvatarDet)
         val tvRequesterName = findViewById<TextView>(R.id.tvRequesterNameDet)
 
-        toolbar.setNavigationOnClickListener { finish() }
+        tvName.text = request.itemName
+        tvStatus.text = request.status
+        tvDesc.text = request.description
+        tvPurpose.text = request.purpose ?: "No purpose provided"
+        tvStart.text = request.startDate?.replace("T", " ")?.substring(0, 16)
+        tvEnd.text = request.endDate?.replace("T", " ")?.substring(0, 16)
+        tvRequesterName.text = request.requesterName
 
-        tvName.text = currentRequest.itemName
-        tvStatus.text = currentRequest.status
-        tvDesc.text = currentRequest.description
-        tvPurpose.text = currentRequest.purpose ?: "No purpose provided"
-        tvStart.text = currentRequest.startDate?.replace("T", " ")?.substring(0, 16)
-        tvEnd.text = currentRequest.endDate?.replace("T", " ")?.substring(0, 16)
-        tvRequesterName.text = currentRequest.requesterName
-
-        currentRequest.itemImage?.let {
+        request.itemImage?.let {
             try {
                 val bytes = Base64.decode(it, Base64.DEFAULT)
                 val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
@@ -81,46 +120,13 @@ class RequestDetailsActivity : AppCompatActivity() {
             } catch (e: Exception) {}
         }
 
-        currentRequest.requesterImage?.let {
+        request.requesterImage?.let {
             try {
                 val bytes = Base64.decode(it, Base64.DEFAULT)
                 val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                 ivRequester.setImageBitmap(bitmap)
             } catch (e: Exception) {}
         }
-
-        val rvOffers = findViewById<RecyclerView>(R.id.rvOffers)
-        rvOffers.layoutManager = LinearLayoutManager(this)
-        offerAdapter = OfferAdapter(emptyList()) { offer ->
-            acceptOffer(offer.id)
-        }
-        rvOffers.adapter = offerAdapter
-
-        val btnOfferToLend = findViewById<MaterialButton>(R.id.btnOfferToLend)
-        val btnConfirmBorrow = findViewById<MaterialButton>(R.id.btnConfirmBorrow)
-        val btnConfirmReturn = findViewById<MaterialButton>(R.id.btnConfirmReturn)
-
-        btnOfferToLend.setOnClickListener {
-            createOffer()
-        }
-
-        btnConfirmBorrow.setOnClickListener {
-            confirmBorrow()
-        }
-
-        btnConfirmReturn.setOnClickListener {
-            confirmReturn()
-        }
-    }
-
-    private fun updateFlow() {
-        val tvStatus = findViewById<TextView>(R.id.tvStatusDet)
-        val cvOffersSection = findViewById<CardView>(R.id.cvOffersSection)
-        val btnOfferToLend = findViewById<MaterialButton>(R.id.btnOfferToLend)
-        val btnConfirmBorrow = findViewById<MaterialButton>(R.id.btnConfirmBorrow)
-        val btnConfirmReturn = findViewById<MaterialButton>(R.id.btnConfirmReturn)
-        val tvReturnStatus = findViewById<TextView>(R.id.tvReturnStatus)
-        val btnContact = findViewById<MaterialButton>(R.id.btnContactLender)
 
         cvOffersSection.visibility = View.GONE
         btnOfferToLend.visibility = View.GONE
@@ -138,7 +144,7 @@ class RequestDetailsActivity : AppCompatActivity() {
         val step4Circle = findViewById<TextView>(R.id.step4_circle)
         val step4Label = findViewById<TextView>(R.id.step4_label)
 
-        val currentStep = when (currentRequest.status.uppercase()) {
+        val currentStep = when (request.status.uppercase()) {
             "POSTED" -> 0
             "MATCHED", "ONGOING" -> 1
             "BORROWED", "BORROWER_RETURNED", "LENDER_RETURNED" -> 2
@@ -168,18 +174,16 @@ class RequestDetailsActivity : AppCompatActivity() {
             }
         }
 
-        tvStatus.text = currentRequest.status
-        val isOwnRequest = currentUserId == currentRequest.requesterId
+        val isOwnRequest = getUserId() == request.requesterId
 
-        when (currentRequest.status.uppercase()) {
-
+        when (request.status.uppercase()) {
             "POSTED" -> {
                 if (isOwnRequest) {
                     cvOffersSection.visibility = View.VISIBLE
-                    fetchOffersForRequest()
+                    presenter.fetchOffers()
                 } else {
                     btnOfferToLend.visibility = View.VISIBLE
-                    checkIfAlreadyOffered(btnOfferToLend)
+                    presenter.checkIfAlreadyOffered()
                 }
             }
             "MATCHED", "ONGOING" -> {
@@ -188,178 +192,68 @@ class RequestDetailsActivity : AppCompatActivity() {
                 }
             }
             "BORROWED", "BORROWER_RETURNED", "LENDER_RETURNED" -> {
-                fetchOffersAndHandleReturn(btnConfirmReturn, tvReturnStatus)
+                presenter.determineReturnFlowState()
             }
         }
     }
 
-    private fun fetchOffersForRequest() {
-        val tvNoOffersYet = findViewById<TextView>(R.id.tvNoOffersYet)
-        val rvOffers = findViewById<RecyclerView>(R.id.rvOffers)
-        
-        RetrofitClient.instance.getOffersForRequest(currentRequest.id)
-            .enqueue(object : Callback<List<Offer>> {
-                override fun onResponse(call: Call<List<Offer>>, response: Response<List<Offer>>) {
-                    if (response.isSuccessful) {
-                        val offers = response.body() ?: emptyList()
-                        offerAdapter.updateData(offers)
-                        
-                        if (offers.isEmpty()) {
-                            tvNoOffersYet.visibility = View.VISIBLE
-                            rvOffers.visibility = View.GONE
-                        } else {
-                            tvNoOffersYet.visibility = View.GONE
-                            rvOffers.visibility = View.VISIBLE
-                        }
-                    }
-                }
-                override fun onFailure(call: Call<List<Offer>>, t: Throwable) {
-                    Toast.makeText(this@RequestDetailsActivity, "Error fetching offers", Toast.LENGTH_SHORT).show()
-                }
-            })
+    override fun showOffers(offers: List<Offer>) {
+        offerAdapter.updateData(offers)
+        tvNoOffersYet.visibility = View.GONE
+        rvOffers.visibility = View.VISIBLE
     }
 
-
-    private fun checkIfAlreadyOffered(btn: MaterialButton) {
-        RetrofitClient.instance.getOffersForRequest(currentRequest.id)
-            .enqueue(object : Callback<List<Offer>> {
-                override fun onResponse(call: Call<List<Offer>>, response: Response<List<Offer>>) {
-                    if (response.isSuccessful) {
-                        val offers = response.body() ?: emptyList()
-                        val hasOffered = offers.any { it.lenderId == currentUserId }
-                        if (hasOffered) {
-                            btn.isEnabled = false
-                            btn.text = "Offer Sent"
-                            btn.setBackgroundColor(android.graphics.Color.parseColor("#E2E8F0"))
-                            btn.setTextColor(android.graphics.Color.parseColor("#94A3B8"))
-                        }
-                    }
-                }
-                override fun onFailure(call: Call<List<Offer>>, t: Throwable) {}
-            })
+    override fun showNoOffers() {
+        tvNoOffersYet.visibility = View.VISIBLE
+        rvOffers.visibility = View.GONE
     }
 
-    private fun fetchOffersAndHandleReturn(btn: MaterialButton, tvStatusText: TextView) {
-        RetrofitClient.instance.getOffersForRequest(currentRequest.id)
-            .enqueue(object : Callback<List<Offer>> {
-                override fun onResponse(call: Call<List<Offer>>, response: Response<List<Offer>>) {
-                    if (response.isSuccessful) {
-                        val offers = response.body() ?: emptyList()
-                        val acceptedOffer = offers.find { it.status.uppercase() == "ACCEPTED" }
-                        if (acceptedOffer != null) {
-                            val isLender = currentUserId == acceptedOffer.lenderId
-                            val isBorrower = currentUserId == currentRequest.requesterId
-
-                            when (currentRequest.status.uppercase()) {
-                                "BORROWED" -> {
-                                    if (isBorrower) {
-                                        btn.visibility = View.VISIBLE
-                                        btn.text = "Mark as Returned"
-                                    } else if (isLender) {
-                                        btn.visibility = View.VISIBLE
-                                        btn.text = "Confirm Return"
-                                    }
-                                }
-                                "BORROWER_RETURNED" -> {
-                                    if (isBorrower) {
-                                        tvStatusText.visibility = View.VISIBLE
-                                        tvStatusText.text = "Waiting for other user to confirm return..."
-                                    } else if (isLender) {
-                                        btn.visibility = View.VISIBLE
-                                        btn.text = "Confirm Return"
-                                    }
-                                }
-                                "LENDER_RETURNED" -> {
-                                    if (isBorrower) {
-                                        btn.visibility = View.VISIBLE
-                                        btn.text = "Mark as Returned"
-                                    } else if (isLender) {
-                                        tvStatusText.visibility = View.VISIBLE
-                                        tvStatusText.text = "Waiting for other user to confirm return..."
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                override fun onFailure(call: Call<List<Offer>>, t: Throwable) {}
-            })
+    override fun setOfferButtonState(isOffered: Boolean) {
+        if (isOffered) {
+            btnOfferToLend.isEnabled = false
+            btnOfferToLend.text = "Offer Sent"
+            btnOfferToLend.setBackgroundColor(android.graphics.Color.parseColor("#E2E8F0"))
+            btnOfferToLend.setTextColor(android.graphics.Color.parseColor("#94A3B8"))
+        } else {
+            btnOfferToLend.isEnabled = true
+            btnOfferToLend.text = "Offer to Lend"
+            btnOfferToLend.setBackgroundColor(android.graphics.Color.parseColor("#1E3A8A"))
+            btnOfferToLend.setTextColor(android.graphics.Color.WHITE)
+        }
     }
 
-    private fun createOffer() {
-        val dto = CreateOfferDTO(currentRequest.id, currentUserId, "I can lend this item.")
-        RetrofitClient.instance.createOffer(dto)
-            .enqueue(object : Callback<Offer> {
-                override fun onResponse(call: Call<Offer>, response: Response<Offer>) {
-                    if (response.isSuccessful) {
-                        Toast.makeText(this@RequestDetailsActivity, "Offer submitted!", Toast.LENGTH_SHORT).show()
-                        setResult(RESULT_OK)
-                        finish()
-                    } else {
-                        Toast.makeText(this@RequestDetailsActivity, "Failed to submit offer", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                override fun onFailure(call: Call<Offer>, t: Throwable) {
-                    Toast.makeText(this@RequestDetailsActivity, "Network error", Toast.LENGTH_SHORT).show()
-                }
-            })
+    override fun showReturnFlow(btnText: String?, statusText: String?) {
+        if (btnText != null) {
+            btnConfirmReturn.visibility = View.VISIBLE
+            btnConfirmReturn.text = btnText
+        }
+        if (statusText != null) {
+            tvReturnStatus.visibility = View.VISIBLE
+            tvReturnStatus.text = statusText
+        }
     }
 
-    private fun acceptOffer(offerId: Long) {
-        RetrofitClient.instance.acceptOffer(offerId)
-            .enqueue(object : Callback<ResponseBody> {
-                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                    if (response.isSuccessful) {
-                        Toast.makeText(this@RequestDetailsActivity, "Offer accepted!", Toast.LENGTH_SHORT).show()
-                        currentRequest = currentRequest.copy(status = "MATCHED")
-                        updateFlow()
-                        setResult(RESULT_OK)
-                    } else {
-                        Toast.makeText(this@RequestDetailsActivity, "Failed to accept offer", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Toast.makeText(this@RequestDetailsActivity, "Network error", Toast.LENGTH_SHORT).show()
-                }
-            })
+    override fun showSuccess(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun confirmBorrow() {
-        RetrofitClient.instance.confirmBorrow(currentRequest.id)
-            .enqueue(object : Callback<BorrowingRequest> {
-                override fun onResponse(call: Call<BorrowingRequest>, response: Response<BorrowingRequest>) {
-                    if (response.isSuccessful && response.body() != null) {
-                        Toast.makeText(this@RequestDetailsActivity, "Confirmed borrow receipt!", Toast.LENGTH_SHORT).show()
-                        currentRequest = response.body()!!
-                        updateFlow()
-                        setResult(RESULT_OK)
-                    } else {
-                        Toast.makeText(this@RequestDetailsActivity, "Failed to confirm borrow", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                override fun onFailure(call: Call<BorrowingRequest>, t: Throwable) {
-                    Toast.makeText(this@RequestDetailsActivity, "Network error", Toast.LENGTH_SHORT).show()
-                }
-            })
+    override fun finishWithResultOk() {
+        setResult(RESULT_OK)
+        finish()
     }
 
-    private fun confirmReturn() {
-        RetrofitClient.instance.confirmReturn(currentRequest.id, currentUserId)
-            .enqueue(object : Callback<BorrowingRequest> {
-                override fun onResponse(call: Call<BorrowingRequest>, response: Response<BorrowingRequest>) {
-                    if (response.isSuccessful && response.body() != null) {
-                        Toast.makeText(this@RequestDetailsActivity, "Return confirmed!", Toast.LENGTH_SHORT).show()
-                        currentRequest = response.body()!!
-                        updateFlow()
-                        setResult(RESULT_OK)
-                    } else {
-                        Toast.makeText(this@RequestDetailsActivity, "Failed to confirm return", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                override fun onFailure(call: Call<BorrowingRequest>, t: Throwable) {
-                    Toast.makeText(this@RequestDetailsActivity, "Network error", Toast.LENGTH_SHORT).show()
-                }
-            })
+    override fun showLoading() {
     }
 
+    override fun hideLoading() {
+    }
+
+    override fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+    }
 }

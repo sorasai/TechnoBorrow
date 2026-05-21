@@ -6,29 +6,29 @@ import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.technoborrowapp.R
-import com.example.technoborrowapp.core.network.RetrofitClient
 import com.example.technoborrowapp.features.auth.data.model.User
 import com.example.technoborrowapp.features.auth.ui.LoginActivity
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.technoborrowapp.features.profile.contract.ProfileContract
+import com.example.technoborrowapp.features.profile.presenter.ProfilePresenter
 
-class ProfileActivity : AppCompatActivity() {
+class ProfileActivity : AppCompatActivity(), ProfileContract.View {
 
+    private lateinit var presenter: ProfileContract.Presenter
     private lateinit var etName: EditText
     private lateinit var etEmail: EditText
     private lateinit var etNewPass: EditText
     private lateinit var etConfirmPass: EditText
     private lateinit var ivAvatar: ImageView
-    private var userId: Long = -1L
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
+        // Initialize Presenter
+        presenter = ProfilePresenter(this)
+
         setupUI()
-        loadData()
+        presenter.start()
     }
 
     private fun setupUI() {
@@ -46,111 +46,85 @@ class ProfileActivity : AppCompatActivity() {
 
         toolbar.setNavigationOnClickListener { finish() }
 
-        btnSave.setOnClickListener { updateProfile() }
-        btnUpdatePass.setOnClickListener { changePassword() }
-        btnLogout.setOnClickListener { logout() }
+        btnSave.setOnClickListener { 
+            presenter.updateProfile(etName.text.toString().trim(), etEmail.text.toString().trim())
+        }
+        btnUpdatePass.setOnClickListener { 
+            presenter.changePassword(etNewPass.text.toString(), etConfirmPass.text.toString())
+        }
+        btnLogout.setOnClickListener { 
+            presenter.logout()
+        }
         
         btnUpload.setOnClickListener {
             Toast.makeText(this, "Photo upload coming soon!", Toast.LENGTH_SHORT).show()
         }
-
-        // Get saved user ID
-        val sharedPref = getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
-        userId = sharedPref.getLong("user_id", -1L)
     }
 
-    private fun loadData() {
-        if (userId == -1L) {
-            Toast.makeText(this, "Session expired", Toast.LENGTH_SHORT).show()
-            logout()
-            return
-        }
-
-        RetrofitClient.instance.getProfile(userId)
-            .enqueue(object : Callback<User> {
-                override fun onResponse(call: Call<User>, response: Response<User>) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { user ->
-                            etName.setText(user.fullName)
-                            etEmail.setText(user.email)
-                            
-                            user.profileImage?.let { imgStr ->
-                                try {
-                                    val decodedString = android.util.Base64.decode(imgStr, android.util.Base64.DEFAULT)
-                                    val bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                                    ivAvatar.setImageBitmap(bitmap)
-                                } catch (e: Exception) {}
-                            }
-                        }
-                    }
-                }
-                override fun onFailure(call: Call<User>, t: Throwable) {
-                    Toast.makeText(this@ProfileActivity, "Failed to load profile", Toast.LENGTH_SHORT).show()
-                }
-            })
+    override fun setPresenter(presenter: ProfileContract.Presenter) {
+        this.presenter = presenter
     }
 
-    private fun updateProfile() {
-        val name = etName.text.toString().trim()
-        if (name.isEmpty()) return
-
-        val userUpdate = User(fullName = name, email = etEmail.text.toString())
-        RetrofitClient.instance.updateProfile(userId, userUpdate)
-            .enqueue(object : Callback<ResponseBody> {
-                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                    if (response.isSuccessful) {
-                        Toast.makeText(this@ProfileActivity, "Profile updated", Toast.LENGTH_SHORT).show()
-                        // Update local shared pref
-                        val sharedPref = getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
-                        sharedPref.edit().putString("full_name", name).apply()
-                    } else {
-                        Toast.makeText(this@ProfileActivity, "Update failed", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Toast.makeText(this@ProfileActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
-    }
-
-    private fun changePassword() {
-        val newPass = etNewPass.text.toString()
-        val confirmPass = etConfirmPass.text.toString()
-
-        if (newPass.isEmpty()) {
-            Toast.makeText(this, "Please enter new password", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (newPass != confirmPass) {
-            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val body = mapOf("newPassword" to newPass)
-        RetrofitClient.instance.changePassword(userId, body)
-            .enqueue(object : Callback<ResponseBody> {
-                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                    if (response.isSuccessful) {
-                        Toast.makeText(this@ProfileActivity, "Password changed successfully", Toast.LENGTH_SHORT).show()
-                        etNewPass.setText("")
-                        etConfirmPass.setText("")
-                    } else {
-                        Toast.makeText(this@ProfileActivity, "Failed to change password", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Toast.makeText(this@ProfileActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
-    }
-
-    private fun logout() {
-        val sharedPref = getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
-        sharedPref.edit().clear().apply()
+    override fun showProfileData(user: User) {
+        etName.setText(user.fullName)
+        etEmail.setText(user.email)
         
+        user.profileImage?.let { imgStr ->
+            try {
+                val decodedString = android.util.Base64.decode(imgStr, android.util.Base64.DEFAULT)
+                val bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                ivAvatar.setImageBitmap(bitmap)
+            } catch (e: Exception) {}
+        }
+    }
+
+    override fun showProfileUpdateSuccess(newName: String) {
+        Toast.makeText(this, "Profile updated", Toast.LENGTH_SHORT).show()
+        val sharedPref = getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
+        sharedPref.edit().putString("full_name", newName).apply()
+    }
+
+    override fun showPasswordChangeSuccess() {
+        Toast.makeText(this, "Password changed successfully", Toast.LENGTH_SHORT).show()
+        etNewPass.setText("")
+        etConfirmPass.setText("")
+    }
+
+    override fun showPhotoUploadSuccess() {
+        Toast.makeText(this, "Photo uploaded successfully", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun navigateToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    override fun clearSession() {
+        val sharedPref = getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
+        sharedPref.edit().clear().apply()
+    }
+
+    override fun getUserId(): Long {
+        val sharedPref = getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
+        return sharedPref.getLong("user_id", -1L)
+    }
+
+    override fun showLoading() {
+        // Show loading indicator
+    }
+
+    override fun hideLoading() {
+        // Hide loading indicator
+    }
+
+    override fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
     }
 }

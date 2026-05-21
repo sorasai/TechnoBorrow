@@ -11,21 +11,19 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.technoborrowapp.R
-import com.example.technoborrowapp.core.network.RetrofitClient
+import com.example.technoborrowapp.features.dashboard.contract.MyRequestsContract
 import com.example.technoborrowapp.features.dashboard.data.model.BorrowingRequest
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.technoborrowapp.features.dashboard.presenter.MyRequestsPresenter
 
-class MyRequestsFragment : Fragment() {
+class MyRequestsFragment : Fragment(), MyRequestsContract.View {
 
+    private lateinit var presenter: MyRequestsContract.Presenter
     private lateinit var activeAdapter: RequestAdapter
     private lateinit var pastAdapter: RequestAdapter
     private lateinit var rvActive: RecyclerView
     private lateinit var rvPast: RecyclerView
     private lateinit var tvEmptyActive: android.widget.TextView
     private lateinit var tvEmptyPast: android.widget.TextView
-    private var currentUserId: Long = -1L
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_my_requests, container, false)
@@ -34,11 +32,10 @@ class MyRequestsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        val sharedPref = requireActivity().getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
-        currentUserId = sharedPref.getLong("user_id", -1L)
-
+        presenter = MyRequestsPresenter(this)
+        
         setupUI(view)
-        fetchData()
+        presenter.start()
     }
 
     private fun setupUI(view: View) {
@@ -68,41 +65,56 @@ class MyRequestsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun fetchData() {
-        RetrofitClient.instance.getAllRequests().enqueue(object : Callback<List<BorrowingRequest>> {
-            override fun onResponse(call: Call<List<BorrowingRequest>>, response: Response<List<BorrowingRequest>>) {
-                if (isAdded && response.isSuccessful) {
-                    val all = response.body() ?: emptyList()
-                    val myRequests = all.filter { it.requesterId == currentUserId }
-                    
-                    val active = myRequests.filter { it.status.uppercase() != "RETURNED" && it.status.uppercase() != "CANCELLED" && it.status.uppercase() != "EXPIRED" }
-                    val past = myRequests.filter { it.status.uppercase() == "RETURNED" || it.status.uppercase() == "CANCELLED" || it.status.uppercase() == "EXPIRED" }
-                    
-                    activeAdapter.updateData(active)
-                    pastAdapter.updateData(past)
-
-                    if (active.isEmpty()) {
-                        tvEmptyActive.visibility = View.VISIBLE
-                        rvActive.visibility = View.GONE
-                    } else {
-                        tvEmptyActive.visibility = View.GONE
-                        rvActive.visibility = View.VISIBLE
-                    }
-
-                    if (past.isEmpty()) {
-                        tvEmptyPast.visibility = View.VISIBLE
-                        rvPast.visibility = View.GONE
-                    } else {
-                        tvEmptyPast.visibility = View.GONE
-                        rvPast.visibility = View.VISIBLE
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<List<BorrowingRequest>>, t: Throwable) {
-                if (isAdded) Toast.makeText(requireContext(), "Failed to fetch requests", Toast.LENGTH_SHORT).show()
-            }
-        })
+    override fun setPresenter(presenter: MyRequestsContract.Presenter) {
+        this.presenter = presenter
     }
 
+    override fun getUserId(): Long {
+        if (!isAdded) return -1L
+        val sharedPref = requireActivity().getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
+        return sharedPref.getLong("user_id", -1L)
+    }
+
+    override fun showActiveRequests(requests: List<BorrowingRequest>) {
+        activeAdapter.updateData(requests)
+    }
+
+    override fun showPastRequests(requests: List<BorrowingRequest>) {
+        pastAdapter.updateData(requests)
+    }
+
+    override fun showEmptyActiveState(isEmpty: Boolean) {
+        if (isEmpty) {
+            tvEmptyActive.visibility = View.VISIBLE
+            rvActive.visibility = View.GONE
+        } else {
+            tvEmptyActive.visibility = View.GONE
+            rvActive.visibility = View.VISIBLE
+        }
+    }
+
+    override fun showEmptyPastState(isEmpty: Boolean) {
+        if (isEmpty) {
+            tvEmptyPast.visibility = View.VISIBLE
+            rvPast.visibility = View.GONE
+        } else {
+            tvEmptyPast.visibility = View.GONE
+            rvPast.visibility = View.VISIBLE
+        }
+    }
+
+    override fun showLoading() {
+    }
+
+    override fun hideLoading() {
+    }
+
+    override fun showError(message: String) {
+        if (isAdded) Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        presenter.onDestroy()
+    }
 }

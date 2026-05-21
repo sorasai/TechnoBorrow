@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,28 +14,23 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.technoborrowapp.R
-import com.example.technoborrowapp.core.network.RetrofitClient
-import com.example.technoborrowapp.features.auth.data.model.User
+import com.example.technoborrowapp.features.dashboard.contract.DashboardContract
 import com.example.technoborrowapp.features.dashboard.data.model.BorrowingRequest
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.technoborrowapp.features.dashboard.presenter.DashboardPresenter
 
-class DashboardFragment : Fragment() {
+class DashboardFragment : Fragment(), DashboardContract.View {
 
+    private lateinit var presenter: DashboardContract.Presenter
     private lateinit var adapter: RequestAdapter
     private lateinit var rvRequests: RecyclerView
     private lateinit var tvEmptyRequests: TextView
     private lateinit var tvStatActive: TextView
     private lateinit var tvStatOngoing: TextView
     private lateinit var tvStatReturned: TextView
-    
-    private var currentUserId: Long = -1L
 
     private val createRequestLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == AppCompatActivity.RESULT_OK) {
-            fetchData() 
+            presenter.loadDashboardData() 
         }
     }
 
@@ -46,8 +40,11 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        presenter = DashboardPresenter(this)
+        
         setupUI(view)
-        fetchData()
+        presenter.start()
     }
 
     private fun setupUI(view: View) {
@@ -65,7 +62,6 @@ class DashboardFragment : Fragment() {
 
         val sharedPref = requireActivity().getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
         val fullName = sharedPref.getString("full_name", "User")
-        currentUserId = sharedPref.getLong("user_id", -1L)
 
         tvWelcome.text = "Welcome, ${fullName?.split(" ")?.get(0)}!"
 
@@ -97,73 +93,48 @@ class DashboardFragment : Fragment() {
         rvRequests.adapter = adapter
     }
 
-    private fun fetchData() {
-        RetrofitClient.instance.getAllRequests().enqueue(object : Callback<List<BorrowingRequest>> {
-            override fun onResponse(call: Call<List<BorrowingRequest>>, response: Response<List<BorrowingRequest>>) {
-                if (isAdded && response.isSuccessful) {
-                    val all = response.body() ?: emptyList()
-                    
-                    // Active Requests Stat: User's requests where status is not Returned, Cancelled, or Expired
-                    val activeCount = all.filter { it.requesterId == currentUserId && it.status.uppercase() != "RETURNED" && it.status.uppercase() != "CANCELLED" && it.status.uppercase() != "EXPIRED" }.size
-                    tvStatActive.text = activeCount.toString()
+    override fun setPresenter(presenter: DashboardContract.Presenter) {
+        this.presenter = presenter
+    }
 
-                    // The explorer list shows all requests that are posted/pending, sorted so user's own requests are at the top
-                    val explorer = all.filter { it.status.uppercase() == "POSTED" || it.status.uppercase() == "PENDING" }
-                        .sortedWith(compareByDescending<BorrowingRequest> { it.requesterId == currentUserId }
-                            .thenByDescending { it.id })
-                    adapter.updateData(explorer)
+    override fun getUserId(): Long {
+        if (!isAdded) return -1L
+        val sharedPref = requireActivity().getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
+        return sharedPref.getLong("user_id", -1L)
+    }
 
+    override fun showStats(activeCount: Int, ongoingCount: Int, returnedCount: Int) {
+        tvStatActive.text = activeCount.toString()
+        tvStatOngoing.text = ongoingCount.toString()
+        tvStatReturned.text = returnedCount.toString()
+    }
 
-                    if (explorer.isEmpty()) {
-                        tvEmptyRequests.visibility = View.VISIBLE
-                        rvRequests.visibility = View.GONE
-                    } else {
-                        tvEmptyRequests.visibility = View.GONE
-                        rvRequests.visibility = View.VISIBLE
-                    }
-                }
-            }
+    override fun showExplorerRequests(requests: List<BorrowingRequest>) {
+        adapter.updateData(requests)
+    }
 
-            override fun onFailure(call: Call<List<BorrowingRequest>>, t: Throwable) {
-                if (isAdded) Toast.makeText(requireContext(), "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-
-        if (currentUserId != -1L) {
-            RetrofitClient.instance.getOffersForUser(currentUserId).enqueue(object : Callback<List<com.example.technoborrowapp.features.dashboard.data.model.Offer>> {
-                override fun onResponse(
-                    call: Call<List<com.example.technoborrowapp.features.dashboard.data.model.Offer>>, 
-                    response: Response<List<com.example.technoborrowapp.features.dashboard.data.model.Offer>>
-                ) {
-                    if (isAdded && response.isSuccessful) {
-                        val offers = response.body() ?: emptyList()
-                        val offeredReqIds = offers.map { it.requestId }.toSet()
-
-                        // To populate stats, fetch requests user participated in
-                        RetrofitClient.instance.getAllRequests().enqueue(object : Callback<List<BorrowingRequest>> {
-                            override fun onResponse(call: Call<List<BorrowingRequest>>, res: Response<List<BorrowingRequest>>) {
-                                if (isAdded && res.isSuccessful) {
-                                    val allReq = res.body() ?: emptyList()
-                                    val myTrans = allReq.filter { offeredReqIds.contains(it.id) }
-
-                                    val ongoingCount = myTrans.filter { 
-                                        val status = it.status.uppercase()
-                                        status == "MATCHED" || status == "BORROWED" || status == "BORROWER_RETURNED" || status == "LENDER_RETURNED" || status == "ONGOING"
-                                    }.size
-                                    
-                                    val returnedCount = myTrans.filter { it.status.uppercase() == "RETURNED" }.size
-                                    
-                                    tvStatOngoing.text = ongoingCount.toString()
-                                    tvStatReturned.text = returnedCount.toString()
-                                }
-                            }
-                            override fun onFailure(call: Call<List<BorrowingRequest>>, t: Throwable) {}
-                        })
-                    }
-                }
-                override fun onFailure(call: Call<List<com.example.technoborrowapp.features.dashboard.data.model.Offer>>, t: Throwable) {}
-            })
+    override fun showEmptyState(isEmpty: Boolean) {
+        if (isEmpty) {
+            tvEmptyRequests.visibility = View.VISIBLE
+            rvRequests.visibility = View.GONE
+        } else {
+            tvEmptyRequests.visibility = View.GONE
+            rvRequests.visibility = View.VISIBLE
         }
     }
 
+    override fun showLoading() {
+    }
+
+    override fun hideLoading() {
+    }
+
+    override fun showError(message: String) {
+        if (isAdded) Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        presenter.onDestroy()
+    }
 }

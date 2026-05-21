@@ -4,27 +4,33 @@ import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.technoborrowapp.R
-import com.example.technoborrowapp.core.network.RetrofitClient
-import com.example.technoborrowapp.features.auth.data.model.User
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.technoborrowapp.features.auth.contract.RegisterContract
+import com.example.technoborrowapp.features.auth.presenter.RegisterPresenter
 
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : AppCompatActivity(), RegisterContract.View {
+
+    private lateinit var presenter: RegisterContract.Presenter
+    private lateinit var etFullName: EditText
+    private lateinit var etEmail: EditText
+    private lateinit var etPassword: EditText
+    private lateinit var etConfirmPassword: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        val etFullName = findViewById<EditText>(R.id.etFullName)
-        val etEmail = findViewById<EditText>(R.id.etEmail)
-        val etPassword = findViewById<EditText>(R.id.etPassword)
-        val etConfirmPassword = findViewById<EditText>(R.id.etConfirmPassword)
+        // Initialize Presenter
+        presenter = RegisterPresenter(this)
+
+        etFullName = findViewById(R.id.etFullName)
+        etEmail = findViewById(R.id.etEmail)
+        etPassword = findViewById(R.id.etPassword)
+        etConfirmPassword = findViewById(R.id.etConfirmPassword)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
         val tvLogin = findViewById<TextView>(R.id.tvLogin)
 
         tvLogin?.setOnClickListener {
-            finish() // Back to Login
+            navigateToLogin()
         }
 
         btnRegister.setOnClickListener {
@@ -32,35 +38,36 @@ class RegisterActivity : AppCompatActivity() {
             val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
             val confirmPassword = etConfirmPassword.text.toString().trim()
-
-            if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (password != confirmPassword) {
-                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val user = User(fullName = fullName, email = email, passwordHash = password)
-
-            RetrofitClient.instance.register(user)
-                .enqueue(object : Callback<User> {
-                    override fun onResponse(call: Call<User>, response: Response<User>) {
-                        if (response.isSuccessful) {
-                            Toast.makeText(this@RegisterActivity, "Registration Successful! Please login.", Toast.LENGTH_LONG).show()
-                            finish()
-                        } else {
-                            val errorMsg = response.errorBody()?.string() ?: "Unknown error"
-                            Toast.makeText(this@RegisterActivity, "Registration failed: $errorMsg", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<User>, t: Throwable) {
-                        Toast.makeText(this@RegisterActivity, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
-                    }
-                })
+            
+            presenter.register(fullName, email, password, confirmPassword)
         }
+    }
+
+    override fun setPresenter(presenter: RegisterContract.Presenter) {
+        this.presenter = presenter
+    }
+
+    override fun showLoading() {
+        Toast.makeText(this, "Registering...", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun hideLoading() {
+    }
+
+    override fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun navigateToLogin() {
+        finish() // Back to Login
+    }
+
+    override fun showRegisterSuccess() {
+        Toast.makeText(this, "Registration Successful! Please login.", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
     }
 }
