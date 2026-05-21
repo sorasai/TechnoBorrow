@@ -11,22 +11,19 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.technoborrowapp.R
-import com.example.technoborrowapp.core.network.RetrofitClient
+import com.example.technoborrowapp.features.dashboard.contract.MyTransactionsContract
 import com.example.technoborrowapp.features.dashboard.data.model.BorrowingRequest
-import com.example.technoborrowapp.features.dashboard.data.model.Offer
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.technoborrowapp.features.dashboard.presenter.MyTransactionsPresenter
 
-class MyTransactionsFragment : Fragment() {
+class MyTransactionsFragment : Fragment(), MyTransactionsContract.View {
 
+    private lateinit var presenter: MyTransactionsContract.Presenter
     private lateinit var ongoingAdapter: RequestAdapter
     private lateinit var pastAdapter: RequestAdapter
     private lateinit var rvOngoing: RecyclerView
     private lateinit var rvPast: RecyclerView
     private lateinit var tvEmptyOngoing: android.widget.TextView
     private lateinit var tvEmptyPast: android.widget.TextView
-    private var currentUserId: Long = -1L
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_my_transactions, container, false)
@@ -35,11 +32,10 @@ class MyTransactionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val sharedPref = requireActivity().getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
-        currentUserId = sharedPref.getLong("user_id", -1L)
+        presenter = MyTransactionsPresenter(this)
 
         setupUI(view)
-        fetchData()
+        presenter.start()
     }
 
     private fun setupUI(view: View) {
@@ -69,62 +65,57 @@ class MyTransactionsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun fetchData() {
-        RetrofitClient.instance.getOffersForUser(currentUserId).enqueue(object : Callback<List<Offer>> {
-            override fun onResponse(call: Call<List<Offer>>, response: Response<List<Offer>>) {
-                if (isAdded && response.isSuccessful) {
-                    val offers = response.body() ?: emptyList()
-                    val offeredReqIds = offers.map { it.requestId }.toSet()
-                    
-                    fetchRequestsAndFilter(offeredReqIds)
-                }
-            }
-
-            override fun onFailure(call: Call<List<Offer>>, t: Throwable) {
-                if (isAdded) Toast.makeText(requireContext(), "Failed to fetch offers", Toast.LENGTH_SHORT).show()
-            }
-        })
+    override fun setPresenter(presenter: MyTransactionsContract.Presenter) {
+        this.presenter = presenter
     }
 
-    private fun fetchRequestsAndFilter(offeredReqIds: Set<Long>) {
-        RetrofitClient.instance.getAllRequests().enqueue(object : Callback<List<BorrowingRequest>> {
-            override fun onResponse(call: Call<List<BorrowingRequest>>, response: Response<List<BorrowingRequest>>) {
-                if (isAdded && response.isSuccessful) {
-                    val all = response.body() ?: emptyList()
-                    val myTransactions = all.filter { offeredReqIds.contains(it.id) || it.requesterId == currentUserId }
-                    
-                    val ongoing = myTransactions.filter { 
-                        val status = it.status.uppercase()
-                        status == "MATCHED" || status == "BORROWED" || status == "BORROWER_RETURNED" || status == "LENDER_RETURNED" || status == "ONGOING"
-                    }
-                    val past = myTransactions.filter { it.status.uppercase() == "RETURNED" || it.status.uppercase() == "CANCELLED" || it.status.uppercase() == "EXPIRED" }
+    override fun getUserId(): Long {
+        if (!isAdded) return -1L
+        val sharedPref = requireActivity().getSharedPreferences("technoborrow", Context.MODE_PRIVATE)
+        return sharedPref.getLong("user_id", -1L)
+    }
 
-                    
-                    ongoingAdapter.updateData(ongoing)
-                    pastAdapter.updateData(past)
+    override fun showOngoingTransactions(requests: List<BorrowingRequest>) {
+        ongoingAdapter.updateData(requests)
+    }
 
-                    if (ongoing.isEmpty()) {
-                        tvEmptyOngoing.visibility = View.VISIBLE
-                        rvOngoing.visibility = View.GONE
-                    } else {
-                        tvEmptyOngoing.visibility = View.GONE
-                        rvOngoing.visibility = View.VISIBLE
-                    }
+    override fun showPastTransactions(requests: List<BorrowingRequest>) {
+        pastAdapter.updateData(requests)
+    }
 
-                    if (past.isEmpty()) {
-                        tvEmptyPast.visibility = View.VISIBLE
-                        rvPast.visibility = View.GONE
-                    } else {
-                        tvEmptyPast.visibility = View.GONE
-                        rvPast.visibility = View.VISIBLE
-                    }
-                }
-            }
+    override fun showEmptyOngoingState(isEmpty: Boolean) {
+        if (isEmpty) {
+            tvEmptyOngoing.visibility = View.VISIBLE
+            rvOngoing.visibility = View.GONE
+        } else {
+            tvEmptyOngoing.visibility = View.GONE
+            rvOngoing.visibility = View.VISIBLE
+        }
+    }
 
-            override fun onFailure(call: Call<List<BorrowingRequest>>, t: Throwable) {
-                if (isAdded) Toast.makeText(requireContext(), "Failed to fetch requests", Toast.LENGTH_SHORT).show()
-            }
-        })
+    override fun showEmptyPastState(isEmpty: Boolean) {
+        if (isEmpty) {
+            tvEmptyPast.visibility = View.VISIBLE
+            rvPast.visibility = View.GONE
+        } else {
+            tvEmptyPast.visibility = View.GONE
+            rvPast.visibility = View.VISIBLE
+        }
+    }
+
+    override fun showLoading() {
+    }
+
+    override fun hideLoading() {
+    }
+
+    override fun showError(message: String) {
+        if (isAdded) Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        presenter.onDestroy()
     }
 }
 
