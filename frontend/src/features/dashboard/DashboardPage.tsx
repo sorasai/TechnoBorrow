@@ -150,7 +150,9 @@ function DashboardPage() {
   const firstName = fullName.split(" ")[0];
 
   const formatCreatedAt = (isoString: string) => {
-    const date = new Date(isoString);
+    const isUTC = isoString.endsWith('Z') || isoString.includes('+') || (isoString.includes('-') && isoString.lastIndexOf('-') > 10);
+    const dateString = isUTC ? isoString : `${isoString}Z`;
+    const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
