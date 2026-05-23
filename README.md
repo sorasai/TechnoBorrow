@@ -6,10 +6,11 @@ TechnoBorrow is a peer-to-peer equipment borrowing platform that allows students
 
 ## 📌 Project Overview
 
-This project follows a **monorepo structure** containing both:
+This project follows a **monorepo structure** containing:
 
 * 🌐 Frontend (React)
 * ⚙️ Backend (Spring Boot)
+* 📱 Mobile (Android App)
 
 ---
 
@@ -26,6 +27,13 @@ This project follows a **monorepo structure** containing both:
 * Java 17
 * Spring Boot
 * Spring Security
+
+### Android App
+
+* Kotlin
+* XML Layouts & Material Components
+* MVP Architecture
+* Gradle (Kotlin DSL)
 
 ### Database
 
@@ -69,6 +77,21 @@ http://localhost:8080
 
 ---
 
+## ▶️ Run Android App
+
+1. Open the `AndroidApp` directory in **Android Studio**.
+2. Wait for the Gradle sync to complete.
+3. Run the application on an **Emulator** or a **Physical Device**.
+
+Alternatively, you can build the APK using Gradle:
+
+```bash
+cd AndroidApp
+./gradlew assembleDebug
+```
+
+---
+
 ## 🔗 API Integration
 
 The frontend communicates with the backend via REST APIs.
@@ -93,11 +116,13 @@ Example endpoints:
 
 ## 🧠 Architecture
 
-This project follows a **3-tier architecture**:
+This project follows a multi-platform architecture consisting of:
 
-* Presentation Layer (React)
-* Application Layer (Spring Boot)
-* Data Layer (PostgreSQL / Supabase)
+* **Presentation Layer**: 
+  * 🌐 Web Frontend (React & Tailwind CSS)
+  * 📱 Mobile App (Native Android in Kotlin using MVP)
+* **Application Layer**: ⚙️ Spring Boot REST APIs
+* **Data Layer**: 💾 PostgreSQL / Supabase
 
 ---
 
